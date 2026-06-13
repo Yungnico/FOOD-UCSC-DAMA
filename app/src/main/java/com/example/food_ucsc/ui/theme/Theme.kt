@@ -243,7 +243,7 @@ private val highContrastDarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun Food_UCSCTheme(
+fun FoodUCSC_Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
