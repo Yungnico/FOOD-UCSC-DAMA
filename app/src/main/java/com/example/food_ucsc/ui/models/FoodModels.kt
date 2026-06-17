@@ -13,5 +13,11 @@ data class FoodItem(
     val description: String,
     val price: Double,
     val category: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val calories: Int = 0
+)
+
+data class NutritionalData(
+    val date: String,
+    val calories: Int
 )

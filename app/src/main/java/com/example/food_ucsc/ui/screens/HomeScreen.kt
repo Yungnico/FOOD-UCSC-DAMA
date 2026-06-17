@@ -40,7 +40,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-        bottomBar = { BottomNavBar() },
+        bottomBar = { BottomNavBar(navController) },
         containerColor = Color(0xFFFBF8FF)
     ) { innerPadding ->
         Column(
@@ -301,7 +301,7 @@ fun FavouriteCard(icon: ImageVector) {
 }
 
 @Composable
-fun BottomNavBar() {
+fun BottomNavBar(navController: NavController) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
@@ -315,17 +315,26 @@ fun BottomNavBar() {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            NavItem("Home", Icons.Default.Home, isActive = true)
-            NavItem("Explore", Icons.Default.Explore, isActive = false)
-            NavItem("Profile", Icons.Default.Person, isActive = false)
+            NavItem("Home", Icons.Default.Home, isActive = true) {
+                navController.navigate(Screen.Home.route)
+            }
+            NavItem("Explore", Icons.Default.Explore, isActive = false) {
+                // Explore logic
+            }
+            NavItem("Profile", Icons.Default.Person, isActive = false) {
+                navController.navigate(Screen.Profile.route)
+            }
         }
     }
 }
 
 @Composable
-fun NavItem(label: String, icon: ImageVector, isActive: Boolean) {
+fun NavItem(label: String, icon: ImageVector, isActive: Boolean, onClick: () -> Unit) {
     val color = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
         Icon(imageVector = icon, contentDescription = label, tint = color)
         Text(text = label, color = color, fontSize = 12.sp)
     }
