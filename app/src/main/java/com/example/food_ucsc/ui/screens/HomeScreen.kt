@@ -9,10 +9,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,18 +22,26 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.models.Category
+import com.example.food_ucsc.ui.models.FoodItem
+import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         bottomBar = { BottomNavBar() },
-        containerColor = Color(0xFFFBF8FF) // Light lavender background
+        containerColor = Color(0xFFFBF8FF)
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -42,11 +51,14 @@ fun HomeScreen(navController: NavController) {
         ) {
             Header()
             Spacer(modifier = Modifier.height(24.dp))
-            CategorySection(navController = navController)
+            CategorySection(
+                categories = uiState.categories,
+                navController = navController
+            )
             Spacer(modifier = Modifier.height(24.dp))
-            RecommendedSection()
+            RecommendedSection(recommendedItems = uiState.recommendedItems)
             Spacer(modifier = Modifier.height(24.dp))
-            FavouriteSection()
+            FavouriteSection(favoriteItems = uiState.favoriteItems)
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
@@ -60,7 +72,6 @@ fun Header() {
             .padding(top = 16.dp, start = 0.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Purple logo background on the left
         Box(
             modifier = Modifier
                 .size(width = 80.dp, height = 64.dp)
@@ -78,7 +89,6 @@ fun Header() {
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        // Search Bar
         Surface(
             modifier = Modifier
                 .weight(1f)
@@ -115,31 +125,15 @@ fun Header() {
 }
 
 @Composable
-fun CategorySection(navController: NavController) {
+fun CategorySection(categories: List<Category>, navController: NavController) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.category),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        Text(
+            text = stringResource(R.string.category),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
         
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // 3 columns x 2 rows grid for better readability
-        val categories = listOf(
-            stringResource(R.string.comida_rapida) to Icons.Default.Fastfood,
-            stringResource(R.string.saludable) to Icons.Default.Restaurant,
-            stringResource(R.string.vegetariana) to Icons.Default.Grass,
-            stringResource(R.string.vegana) to Icons.Default.Eco,
-            stringResource(R.string.postres) to Icons.Default.Cake,
-            stringResource(R.string.otros) to Icons.Default.MoreHoriz
-        )
         
         Column {
             categories.chunked(3).forEachIndexed { index, rowCategories ->
@@ -147,18 +141,20 @@ fun CategorySection(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    rowCategories.forEach { (name, icon) ->
+                    rowCategories.forEach { category ->
                         CategoryItem(
-                            name = name,
-                            icon = icon,
+                            name = category.name,
+                            icon = category.icon,
                             modifier = Modifier.weight(1f),
                             onClick = {
-                                navController.navigate(Screen.Category.createRoute(name))
+                                navController.navigate(Screen.Category.createRoute(category.name))
                             }
                         )
                     }
                 }
-                if (index == 0) Spacer(modifier = Modifier.height(16.dp))
+                if (index < categories.chunked(3).size - 1) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }
@@ -201,7 +197,7 @@ fun CategoryItem(
 }
 
 @Composable
-fun RecommendedSection() {
+fun RecommendedSection(recommendedItems: List<FoodItem>) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -213,7 +209,6 @@ fun RecommendedSection() {
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
         }
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -222,9 +217,9 @@ fun RecommendedSection() {
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ProductCard("T Shirts", Icons.Default.Checkroom)
-            ProductCard("Trousers", Icons.Default.Checkroom) // Placeholder icon
-            ProductCard("Bag", Icons.Default.ShoppingBag)
+            recommendedItems.forEach { item ->
+                ProductCard(item.name, item.icon)
+            }
         }
     }
 }
@@ -266,7 +261,7 @@ fun ProductCard(name: String, icon: ImageVector) {
 }
 
 @Composable
-fun FavouriteSection() {
+fun FavouriteSection(favoriteItems: List<FoodItem>) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = stringResource(R.string.favorite),
@@ -280,9 +275,9 @@ fun FavouriteSection() {
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            FavouriteCard(Icons.Default.Laptop)
-            FavouriteCard(Icons.Default.Weekend)
-            FavouriteCard(Icons.Default.Restaurant)
+            favoriteItems.forEach { item ->
+                FavouriteCard(item.icon)
+            }
         }
     }
 }
@@ -322,7 +317,6 @@ fun BottomNavBar() {
         ) {
             NavItem("Home", Icons.Default.Home, isActive = true)
             NavItem("Explore", Icons.Default.Explore, isActive = false)
-            NavItem("Basket", Icons.Default.ShoppingBasket, isActive = false)
             NavItem("Profile", Icons.Default.Person, isActive = false)
         }
     }
@@ -335,12 +329,4 @@ fun NavItem(label: String, icon: ImageVector, isActive: Boolean) {
         Icon(imageVector = icon, contentDescription = label, tint = color)
         Text(text = label, color = color, fontSize = 12.sp)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    // Para el preview, podemos usar un NavController falso o simplemente no pasar nada
-    // pero como HomeScreen ahora lo requiere, usaremos uno básico
-    // HomeScreen(navController = rememberNavController())
 }
