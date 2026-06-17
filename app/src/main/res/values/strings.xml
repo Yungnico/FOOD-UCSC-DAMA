@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Food_UCSC</string>
+    <string name="start_here">Busca aquí ...</string>
+    <string name="menu">Menu</string>
+    <string name="search">Buscar</string>
+    <string name="category">Categorias</string>
+    <string name="recommended">Recomendados</string>
+    <string name="favorite">Favoritos</string>
+    <string name="comida_rapida">Comida Rápida</string>
+    <string name="saludable">Saludable</string>
+    <string name="vegetariana">Vegetariana</string>
+    <string name="vegana">Vegana</string>
+    <string name="postres">Postres</string>
+    <string name="desayuno">Desayunos</string>
+    <string name="otros">Otros</string>
+    <string name="inicio">Inicio</string>
+
 </resources>

@@ -2,6 +2,7 @@ package com.example.food_ucsc.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,14 +18,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.food_ucsc.R
+import com.example.food_ucsc.navigation.Screen
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     Scaffold(
         bottomBar = { BottomNavBar() },
         containerColor = Color(0xFFFBF8FF) // Light lavender background
@@ -37,7 +42,7 @@ fun HomeScreen() {
         ) {
             Header()
             Spacer(modifier = Modifier.height(24.dp))
-            CategorySection()
+            CategorySection(navController = navController)
             Spacer(modifier = Modifier.height(24.dp))
             RecommendedSection()
             Spacer(modifier = Modifier.height(24.dp))
@@ -86,21 +91,21 @@ fun Header() {
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "Search here ...",
+                    text = stringResource(R.string.start_here),
                     color = Color.Gray,
                     fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
+                    contentDescription = stringResource(R.string.menu),
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
+                    contentDescription = stringResource(R.string.search),
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )
@@ -110,7 +115,7 @@ fun Header() {
 }
 
 @Composable
-fun CategorySection() {
+fun CategorySection(navController: NavController) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -118,35 +123,39 @@ fun CategorySection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Category",
+                text = stringResource(R.string.category),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
         }
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // 4 columns x 2 rows grid
+        // 3 columns x 2 rows grid for better readability
         val categories = listOf(
-            "All" to Icons.Default.Adjust,
-            "Fashion" to Icons.Default.Checkroom,
-            "Electronic" to Icons.Default.Monitor,
-            "Game" to Icons.Default.Gamepad,
-            "Music" to Icons.Default.Headphones,
-            "Furniture" to Icons.Default.Weekend,
-            "Food" to Icons.Default.ShoppingBasket,
-            "Other" to Icons.Default.MoreHoriz
+            stringResource(R.string.comida_rapida) to Icons.Default.Fastfood,
+            stringResource(R.string.saludable) to Icons.Default.Restaurant,
+            stringResource(R.string.vegetariana) to Icons.Default.Grass,
+            stringResource(R.string.vegana) to Icons.Default.Eco,
+            stringResource(R.string.postres) to Icons.Default.Cake,
+            stringResource(R.string.otros) to Icons.Default.MoreHoriz
         )
         
         Column {
-            categories.chunked(4).forEachIndexed { index, rowCategories ->
+            categories.chunked(3).forEachIndexed { index, rowCategories ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     rowCategories.forEach { (name, icon) ->
-                        CategoryItem(name, icon)
+                        CategoryItem(
+                            name = name,
+                            icon = icon,
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                navController.navigate(Screen.Category.createRoute(name))
+                            }
+                        )
                     }
                 }
                 if (index == 0) Spacer(modifier = Modifier.height(16.dp))
@@ -156,26 +165,38 @@ fun CategorySection() {
 }
 
 @Composable
-fun CategoryItem(name: String, icon: ImageVector) {
+fun CategoryItem(
+    name: String, 
+    icon: ImageVector, 
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(70.dp)
+        modifier = modifier.clickable { onClick() }
     ) {
         Surface(
-            modifier = Modifier.size(60.dp),
-            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.size(72.dp),
+            shape = RoundedCornerShape(16.dp),
             color = Color(0xFFEADDFF),
             shadowElevation = 2.dp
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = name,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(20.dp),
                 tint = Color(0xFF21005D)
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = name, fontSize = 12.sp, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = name,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            lineHeight = 18.sp,
+            maxLines = 2
+        )
     }
 }
 
@@ -188,7 +209,7 @@ fun RecommendedSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Recommended",
+                text = stringResource(R.string.recommended),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -248,7 +269,7 @@ fun ProductCard(name: String, icon: ImageVector) {
 fun FavouriteSection() {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text = "Favourite",
+            text = stringResource(R.string.favorite),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -319,5 +340,7 @@ fun NavItem(label: String, icon: ImageVector, isActive: Boolean) {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    // Para el preview, podemos usar un NavController falso o simplemente no pasar nada
+    // pero como HomeScreen ahora lo requiere, usaremos uno básico
+    // HomeScreen(navController = rememberNavController())
 }
