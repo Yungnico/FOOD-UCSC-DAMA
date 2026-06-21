@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.food_ucsc.data.repository.FoodRepository
 import com.example.food_ucsc.ui.models.Category
 import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.state.HomeUiState
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val foodRepository: FoodRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -25,36 +26,48 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             
-            // Simulación de carga de datos (esto vendría de un repositorio)
-            val categories = listOf(
-                Category("Comida Rápida", Icons.Default.Fastfood),
-                Category("Saludable", Icons.Default.Restaurant),
-                Category("Vegetariana", Icons.Default.Grass),
-                Category("Vegana", Icons.Default.Eco),
-                Category("Postres", Icons.Default.Cake),
-                Category("Otros", Icons.Default.MoreHoriz)
-            )
-
-            val recommended = listOf(
-                FoodItem(1, "T Shirts", "Description", 10.0, "Otros", Icons.Default.Checkroom),
-                FoodItem(2, "Trousers", "Description", 15.0, "Otros", Icons.Default.Checkroom),
-                FoodItem(3, "Bag", "Description", 20.0, "Otros", Icons.Default.ShoppingBag)
-            )
-
-            val favorites = listOf(
-                FoodItem(4, "Laptop", "Description", 1000.0, "Otros", Icons.Default.Laptop),
-                FoodItem(5, "Weekend", "Description", 50.0, "Otros", Icons.Default.Weekend),
-                FoodItem(6, "Restaurant", "Description", 30.0, "Saludable", Icons.Default.Restaurant)
-            )
-
-            _uiState.update { 
-                it.copy(
-                    categories = categories,
-                    recommendedItems = recommended,
-                    favoriteItems = favorites,
-                    isLoading = false
-                ) 
+            try {
+                // In a real app, we might want to fetch restaurants or specific recommended items from the API
+                // For now, we'll keep the categories mock but try to fetch something if possible
+                // or just stay with mock until API has these endpoints
+                loadMockHomeData()
+            } catch (e: Exception) {
+                loadMockHomeData()
             }
+        }
+    }
+
+    private fun loadMockHomeData() {
+        val categories = listOf(
+            Category("Comida Rápida", Icons.Default.Fastfood),
+            Category("Saludable", Icons.Default.Restaurant),
+            Category("Vegetariana", Icons.Default.Grass),
+            Category("Vegana", Icons.Default.Eco),
+            Category("Postres", Icons.Default.Cake),
+            Category("Bebidas", Icons.Default.LocalDrink),
+            Category("Snacks", Icons.Default.LunchDining),
+            Category("Otros", Icons.Default.MoreHoriz)
+        )
+
+        val recommended = listOf(
+            FoodItem(1, "Sándwich Ave", "Pollo con mayonesa", 2500.0, "Snacks", 10, Icons.Default.LunchDining),
+            FoodItem(2, "Ensalada César", "Lechuga, crutones, queso", 3000.0, "Saludable", 5, Icons.Default.Restaurant),
+            FoodItem(3, "Jugo Frambuesa", "Fruta natural 500ml", 1500.0, "Bebidas", 20, Icons.Default.LocalDrink)
+        )
+
+        val favorites = listOf(
+            FoodItem(4, "Papas Fritas", "Porción familiar", 2000.0, "Comida Rápida", 15, Icons.Default.Fastfood),
+            FoodItem(5, "Muffin Chocolate", "Recién horneado", 1200.0, "Postres", 8, Icons.Default.Cake),
+            FoodItem(6, "Pizza Slice", "Peperoni y queso", 1800.0, "Comida Rápida", 12, Icons.Default.LocalPizza)
+        )
+
+        _uiState.update { 
+            it.copy(
+                categories = categories,
+                recommendedItems = recommended,
+                favoriteItems = favorites,
+                isLoading = false
+            )
         }
     }
 

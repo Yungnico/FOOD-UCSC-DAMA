@@ -8,12 +8,20 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.screens.AllCategoriesScreen
 import com.example.food_ucsc.ui.screens.CategoryScreen
+import com.example.food_ucsc.ui.screens.ExploreScreen
 import com.example.food_ucsc.ui.screens.HomeScreen
 import com.example.food_ucsc.ui.screens.NutritionalInfoScreen
 import com.example.food_ucsc.ui.screens.ProfileScreen
+import com.example.food_ucsc.ui.screens.RestaurantDetailScreen
 import com.example.food_ucsc.ui.theme.FoodUCSC_Theme
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +47,21 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Screen.NutritionalInfo.route) {
                         NutritionalInfoScreen(navController = navController)
+                    }
+                    composable(Screen.AllCategories.route) {
+                        val viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+                        val uiState by viewModel.uiState.collectAsState()
+                        AllCategoriesScreen(
+                            navController = navController,
+                            categories = uiState.categories
+                        )
+                    }
+                    composable(Screen.Explore.route) {
+                        ExploreScreen(navController = navController)
+                    }
+                    composable(Screen.RestaurantDetail.route) { backStackEntry ->
+                        val restaurantId = backStackEntry.arguments?.getString("restaurantId")?.toIntOrNull() ?: 0
+                        RestaurantDetailScreen(restaurantId = restaurantId, navController = navController)
                     }
                 }
             }

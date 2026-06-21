@@ -28,14 +28,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.components.BottomNavBar
 import com.example.food_ucsc.ui.models.Category
 import com.example.food_ucsc.ui.models.FoodItem
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -126,6 +128,9 @@ fun Header() {
 
 @Composable
 fun CategorySection(categories: List<Category>, navController: NavController) {
+    val displayCategories = categories.filter { it.name != "Otros" }.take(5) +
+            (categories.find { it.name == "Otros" } ?: Category("Otros", Icons.Default.MoreHoriz))
+
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = stringResource(R.string.category),
@@ -136,7 +141,7 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Column {
-            categories.chunked(3).forEachIndexed { index, rowCategories ->
+            displayCategories.chunked(3).forEachIndexed { index, rowCategories ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -147,12 +152,22 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
                             icon = category.icon,
                             modifier = Modifier.weight(1f),
                             onClick = {
-                                navController.navigate(Screen.Category.createRoute(category.name))
+                                if (category.name == "Otros") {
+                                    navController.navigate(Screen.AllCategories.route)
+                                } else {
+                                    navController.navigate(Screen.Category.createRoute(category.name))
+                                }
                             }
                         )
                     }
+                    // Si la fila no está completa (menos de 3), rellenamos con Espaciadores con peso
+                    if (rowCategories.size < 3) {
+                        repeat(3 - rowCategories.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
-                if (index < categories.chunked(3).size - 1) {
+                if (index < displayCategories.chunked(3).size - 1) {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -218,7 +233,7 @@ fun RecommendedSection(recommendedItems: List<FoodItem>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             recommendedItems.forEach { item ->
-                ProductCard(item.name, item.icon)
+                ProductCard(item.nombre, item.icon)
             }
         }
     }
@@ -297,45 +312,5 @@ fun FavouriteCard(icon: ImageVector) {
         ) {
             Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.Gray)
         }
-    }
-}
-
-@Composable
-fun BottomNavBar(navController: NavController) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        shadowElevation = 8.dp,
-        color = Color.White
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            NavItem("Home", Icons.Default.Home, isActive = true) {
-                navController.navigate(Screen.Home.route)
-            }
-            NavItem("Explore", Icons.Default.Explore, isActive = false) {
-                // Explore logic
-            }
-            NavItem("Profile", Icons.Default.Person, isActive = false) {
-                navController.navigate(Screen.Profile.route)
-            }
-        }
-    }
-}
-
-@Composable
-fun NavItem(label: String, icon: ImageVector, isActive: Boolean, onClick: () -> Unit) {
-    val color = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Icon(imageVector = icon, contentDescription = label, tint = color)
-        Text(text = label, color = color, fontSize = 12.sp)
     }
 }

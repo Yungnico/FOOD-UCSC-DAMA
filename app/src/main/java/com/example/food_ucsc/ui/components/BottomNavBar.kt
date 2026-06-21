@@ -1,0 +1,87 @@
+package com.example.food_ucsc.ui.components
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.food_ucsc.navigation.Screen
+
+@Composable
+fun BottomNavBar(navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        shadowElevation = 8.dp,
+        color = Color.White
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            NavItem(
+                label = "Home",
+                icon = Icons.Default.Home,
+                isActive = currentRoute == Screen.Home.route
+            ) {
+                if (currentRoute != Screen.Home.route) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
+            }
+            NavItem(
+                label = "Explore",
+                icon = Icons.Default.Explore,
+                isActive = currentRoute == Screen.Explore.route
+            ) {
+                if (currentRoute != Screen.Explore.route) {
+                    navController.navigate(Screen.Explore.route)
+                }
+            }
+            NavItem(
+                label = "Profile",
+                icon = Icons.Default.Person,
+                isActive = currentRoute == Screen.Profile.route
+            ) {
+                if (currentRoute != Screen.Profile.route) {
+                    navController.navigate(Screen.Profile.route)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NavItem(label: String, icon: ImageVector, isActive: Boolean, onClick: () -> Unit) {
+    val color = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Icon(imageVector = icon, contentDescription = label, tint = color)
+        Text(text = label, color = color, fontSize = 12.sp)
+    }
+}
