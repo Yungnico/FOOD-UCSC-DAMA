@@ -31,3 +31,23 @@ data class FoodItemDto(
     @SerializedName("categoria_basica") val categoriaBasica: String,
     @SerializedName("stock") val stock: Int
 )
+
+data class FavoriteDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("usuario_id") val usuarioId: Int,
+    @SerializedName("producto_id") val productoId: Int,
+    @SerializedName("producto") val producto: FoodItemDto? = null
+)
+
+data class TipDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("descripcion") val descripcion: String,
+    @SerializedName("categoria") val categoria: String
+)
+
+data class ChallengeDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("titulo") val titulo: String,
+    @SerializedName("descripcion") val descripcion: String,
+    @SerializedName("recompensa_puntos") val recompensaPuntos: Int
+)
