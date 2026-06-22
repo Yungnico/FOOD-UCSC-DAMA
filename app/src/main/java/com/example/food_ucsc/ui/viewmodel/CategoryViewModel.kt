@@ -61,7 +61,7 @@ class CategoryViewModel(private val foodRepository: FoodRepository) : ViewModel(
                     contacto = "+56 41 273 5000",
                     latitude = -36.801,
                     longitude = -73.013,
-                    tiempo_espera_estatico = "15-20 min",
+                    tiempo_espera_estimado = "15-20 min",
                     rating = 4.5,
                     icon = Icons.Default.Restaurant,
                     bannerColor = 0xFF6750A4

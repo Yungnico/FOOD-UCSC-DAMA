@@ -94,7 +94,7 @@ fun RestaurantDetailScreen(
 }
 
 @Composable
-fun RestaurantHeader(restaurant: com.example.food_ucsc.ui.models.Restaurant) {
+fun RestaurantHeader(restaurant: Restaurant) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +132,7 @@ fun RestaurantHeader(restaurant: com.example.food_ucsc.ui.models.Restaurant) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            InfoChip(icon = Icons.Default.AccessTime, text = restaurant.tiempo_espera_estatico)
+            InfoChip(icon = Icons.Default.AccessTime, text = restaurant.tiempo_espera_estimado)
             InfoChip(icon = Icons.Default.Star, text = restaurant.rating.toString())
             InfoChip(icon = Icons.Default.Phone, text = "Contacto")
         }

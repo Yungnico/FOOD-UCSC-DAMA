@@ -40,7 +40,7 @@ fun ExploreScreen(navController: NavController) {
             contacto = "+56 41 273 5000",
             latitude = -36.801,
             longitude = -73.013,
-            tiempo_espera_estatico = "15-20 min",
+            tiempo_espera_estimado = "15-20 min",
             rating = 4.5,
             icon = Icons.Default.Restaurant,
             bannerColor = 0xFF6750A4
@@ -53,7 +53,7 @@ fun ExploreScreen(navController: NavController) {
             contacto = "cafeteria@ucsc.cl",
             latitude = -36.802,
             longitude = -73.014,
-            tiempo_espera_estatico = "5-10 min",
+            tiempo_espera_estimado = "5-10 min",
             rating = 4.8,
             icon = Icons.Default.Coffee,
             bannerColor = 0xFF3F51B5
@@ -66,7 +66,7 @@ fun ExploreScreen(navController: NavController) {
             contacto = "N/A",
             latitude = -36.803,
             longitude = -73.015,
-            tiempo_espera_estatico = "10-15 min",
+            tiempo_espera_estimado = "10-15 min",
             rating = 4.2,
             icon = Icons.Default.Grass,
             bannerColor = 0xFF4CAF50
@@ -79,7 +79,7 @@ fun ExploreScreen(navController: NavController) {
             contacto = "pizzeria@ucsc.cl",
             latitude = -36.804,
             longitude = -73.016,
-            tiempo_espera_estatico = "20-30 min",
+            tiempo_espera_estimado = "20-30 min",
             rating = 4.0,
             icon = Icons.Default.LocalPizza,
             bannerColor = 0xFFFF9800
@@ -92,7 +92,7 @@ fun ExploreScreen(navController: NavController) {
             contacto = "+56 9 1234 5678",
             latitude = -36.805,
             longitude = -73.017,
-            tiempo_espera_estatico = "5 min",
+            tiempo_espera_estimado = "5 min",
             rating = 4.7,
             icon = Icons.Default.Cake,
             bannerColor = 0xFFE91E63

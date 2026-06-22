@@ -10,7 +10,7 @@ data class RestaurantDto(
     @SerializedName("contacto") val contacto: String,
     @SerializedName("latitude") val latitude: Double,
     @SerializedName("longitude") val longitude: Double,
-    @SerializedName("tiempo_espera_estatico") val tiempoEspera: String,
+    @SerializedName("tiempo_espera_estimado") val tiempo_espera_estimado: String,
     @SerializedName("rating") val rating: Double
 )
 

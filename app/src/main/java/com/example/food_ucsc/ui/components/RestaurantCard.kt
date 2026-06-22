@@ -85,7 +85,7 @@ fun RestaurantCard(restaurant: Restaurant, onClick: () -> Unit = {}) {
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = " ${restaurant.tiempo_espera_estatico}",
+                        text = " ${restaurant.tiempo_espera_estimado}",
                         fontSize = 12.sp,
                         color = Color.Gray
                     )

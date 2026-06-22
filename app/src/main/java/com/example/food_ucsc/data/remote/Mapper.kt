@@ -19,7 +19,7 @@ fun RestaurantDto.toDomain(): Restaurant {
         contacto = this.contacto,
         latitude = this.latitude,
         longitude = this.longitude,
-        tiempo_espera_estatico = this.tiempoEspera,
+        tiempo_espera_estimado = this.tiempo_espera_estimado,
         rating = this.rating,
         icon = Icons.Default.Restaurant, // Default icon
         bannerColor = 0xFF6750A4 // Default color

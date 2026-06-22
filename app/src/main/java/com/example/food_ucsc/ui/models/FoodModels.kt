@@ -40,7 +40,7 @@ data class Restaurant(
     val contacto: String,
     val latitude: Double,
     val longitude: Double,
-    val tiempo_espera_estatico: String,
+    val tiempo_espera_estimado: String,
     val rating: Double,
     val icon: ImageVector,
     val bannerColor: Long = 0xFF6750A4
