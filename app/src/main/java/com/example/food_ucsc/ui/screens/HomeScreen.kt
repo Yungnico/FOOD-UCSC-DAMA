@@ -30,7 +30,9 @@ import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.components.BottomNavBar
 import com.example.food_ucsc.ui.models.Category
+import com.example.food_ucsc.ui.models.Challenge
 import com.example.food_ucsc.ui.models.FoodItem
+import com.example.food_ucsc.ui.models.HealthTip
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
@@ -61,6 +63,10 @@ fun HomeScreen(
             RecommendedSection(recommendedItems = uiState.recommendedItems)
             Spacer(modifier = Modifier.height(24.dp))
             FavouriteSection(favoriteItems = uiState.favoriteItems)
+            Spacer(modifier = Modifier.height(24.dp))
+            TipsSection(tips = uiState.tips)
+            Spacer(modifier = Modifier.height(24.dp))
+            ChallengesSection(challenges = uiState.challenges)
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
@@ -311,6 +317,80 @@ fun FavouriteCard(icon: ImageVector) {
             contentAlignment = Alignment.Center
         ) {
             Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.Gray)
+        }
+    }
+}
+
+@Composable
+fun TipsSection(tips: List<HealthTip>) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "Consejos rápidos",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        tips.take(3).forEach { tip ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White,
+                shadowElevation = 1.dp
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = tip.categoria,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF6750A4),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = tip.descripcion, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChallengesSection(challenges: List<Challenge>) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "Desafíos saludables",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        challenges.take(3).forEach { challenge ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFF5F1FF)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = challenge.titulo,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = challenge.descripcion, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Recompensa: ${challenge.recompensaPuntos} pts",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF4A2B8A)
+                    )
+                }
+            }
         }
     }
 }
