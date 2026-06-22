@@ -32,6 +32,19 @@ data class NutritionalData(
     val calories: Int
 )
 
+data class HealthTip(
+    val id: Int,
+    val descripcion: String,
+    val categoria: String
+)
+
+data class Challenge(
+    val id: Int,
+    val titulo: String,
+    val descripcion: String,
+    val recompensaPuntos: Int
+)
+
 data class Restaurant(
     val id: Int,
     val nombre: String,
