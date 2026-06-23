@@ -28,14 +28,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.components.BottomNavBar
 import com.example.food_ucsc.ui.models.Category
+import com.example.food_ucsc.ui.models.Challenge
 import com.example.food_ucsc.ui.models.FoodItem
+import com.example.food_ucsc.ui.models.HealthTip
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -83,6 +87,10 @@ fun HomeScreen(
             RecommendedSection(recommendedItems = uiState.recommendedItems)
             Spacer(modifier = Modifier.height(24.dp))
             FavouriteSection(favoriteItems = uiState.favoriteItems)
+            Spacer(modifier = Modifier.height(24.dp))
+            TipsSection(tips = uiState.tips)
+            Spacer(modifier = Modifier.height(24.dp))
+            ChallengesSection(challenges = uiState.challenges)
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
@@ -150,6 +158,9 @@ fun Header() {
 
 @Composable
 fun CategorySection(categories: List<Category>, navController: NavController) {
+    val displayCategories = categories.filter { it.name != "Otros" }.take(5) +
+            (categories.find { it.name == "Otros" } ?: Category("Otros", Icons.Default.MoreHoriz))
+
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = stringResource(R.string.category),
@@ -160,7 +171,7 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
         
         Column {
-            categories.chunked(3).forEachIndexed { index, rowCategories ->
+            displayCategories.chunked(3).forEachIndexed { index, rowCategories ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -171,12 +182,22 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
                             icon = category.icon,
                             modifier = Modifier.weight(1f),
                             onClick = {
-                                navController.navigate(Screen.Category.createRoute(category.name))
+                                if (category.name == "Otros") {
+                                    navController.navigate(Screen.AllCategories.route)
+                                } else {
+                                    navController.navigate(Screen.Category.createRoute(category.name))
+                                }
                             }
                         )
                     }
+                    // Si la fila no está completa (menos de 3), rellenamos con Espaciadores con peso
+                    if (rowCategories.size < 3) {
+                        repeat(3 - rowCategories.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
-                if (index < categories.chunked(3).size - 1) {
+                if (index < displayCategories.chunked(3).size - 1) {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -242,7 +263,7 @@ fun RecommendedSection(recommendedItems: List<FoodItem>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             recommendedItems.forEach { item ->
-                ProductCard(item.name, item.icon)
+                ProductCard(item.nombre, item.icon)
             }
         }
     }
@@ -325,41 +346,75 @@ fun FavouriteCard(icon: ImageVector) {
 }
 
 @Composable
-fun BottomNavBar(navController: NavController) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        shadowElevation = 8.dp,
-        color = Color.White
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            NavItem("Home", Icons.Default.Home, isActive = true) {
-                navController.navigate(Screen.Home.route)
-            }
-            NavItem("Explore", Icons.Default.Explore, isActive = false) {
-                // Explore logic
-            }
-            NavItem("Profile", Icons.Default.Person, isActive = false) {
-                navController.navigate(Screen.Profile.route)
+fun TipsSection(tips: List<HealthTip>) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "Consejos rápidos",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        tips.take(3).forEach { tip ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White,
+                shadowElevation = 1.dp
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = tip.categoria,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF6750A4),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = tip.descripcion, style = MaterialTheme.typography.bodyMedium)
+                }
             }
         }
     }
 }
 
 @Composable
-fun NavItem(label: String, icon: ImageVector, isActive: Boolean, onClick: () -> Unit) {
-    val color = if (isActive) MaterialTheme.colorScheme.primary else Color.Gray
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Icon(imageVector = icon, contentDescription = label, tint = color)
-        Text(text = label, color = color, fontSize = 12.sp)
+fun ChallengesSection(challenges: List<Challenge>) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "Desafíos saludables",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        challenges.take(3).forEach { challenge ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFF5F1FF)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = challenge.titulo,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = challenge.descripcion, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Recompensa: ${challenge.recompensaPuntos} pts",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color(0xFF4A2B8A)
+                    )
+                }
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,7 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.components.FoodItemCard
+import com.example.food_ucsc.ui.components.RestaurantCard
 import com.example.food_ucsc.ui.models.Category
+import com.example.food_ucsc.ui.models.Restaurant
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.CategoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +37,7 @@ import com.example.food_ucsc.ui.viewmodel.CategoryViewModel
 fun CategoryScreen(
     categoryName: String, 
     navController: NavController,
-    viewModel: CategoryViewModel = viewModel()
+    viewModel: CategoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -45,7 +51,7 @@ fun CategoryScreen(
                 title = { Text(text = categoryName) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -75,16 +81,45 @@ fun CategoryScreen(
                     }
                 )
             } else {
-                // Si no, mostramos la lista de platos
+                // Si no, mostramos la lista de locales o platos
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(uiState.items) { item ->
-                        FoodItemCard(item = item)
+                    if (uiState.restaurants.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Locales en esta categoría",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        items(uiState.restaurants) { restaurant ->
+                            RestaurantCard(restaurant = restaurant, onClick = {
+                                navController.navigate(Screen.RestaurantDetail.createRoute(restaurant.id))
+                            })
+                        }
+                    }
+                    
+                    if (uiState.items.isNotEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Platos populares",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        items(uiState.items) { item ->
+                            FoodItemCard(item = item, onClick = {
+                                // Detalle del plato
+                            })
+                        }
                     }
                 }
             }
@@ -158,27 +193,5 @@ fun CategoryItemSimple(
             lineHeight = 18.sp,
             maxLines = 2
         )
-    }
-}
-
-@Composable
-fun FoodItemCard(item: com.example.food_ucsc.ui.models.FoodItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = item.icon, contentDescription = null, modifier = Modifier.size(40.dp))
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = item.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = item.description, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-                Text(text = "$${item.price}", style = MaterialTheme.typography.labelLarge, color = Color(0xFF6750A4))
-            }
-        }
     }
 }
