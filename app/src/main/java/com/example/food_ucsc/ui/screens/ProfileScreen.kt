@@ -28,7 +28,7 @@ fun ProfileScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Perfil", fontWeight = FontWeight.Bold) },
+                title = { Text("Mi perfil", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
@@ -82,16 +82,16 @@ fun ProfileScreen(navController: NavController) {
             // Menu Options
             ProfileMenuItem(
                 icon = Icons.Default.Info,
-                title = "Información Nutricional",
+                title = "Información nutricional",
                 subtitle = "Dashboard, calorías y estadísticas",
                 onClick = { navController.navigate(Screen.NutritionalInfo.route) }
             )
             
             ProfileMenuItem(
                 icon = Icons.Default.History,
-                title = "Historial de Compras",
-                subtitle = "Mis pedidos anteriores",
-                onClick = { /* TODO */ }
+                title = "Historial de compras",
+                subtitle = "Mis pedidos anteriores y calificar",
+                onClick = { navController.navigate(Screen.OrderHistory.route) }
             )
             
             ProfileMenuItem(
@@ -109,7 +109,7 @@ fun ProfileScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB3261E)),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cerrar Sesión")
+                Text("Cerrar sesión")
             }
         }
     }

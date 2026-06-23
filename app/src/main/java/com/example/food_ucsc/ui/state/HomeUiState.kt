@@ -12,5 +12,7 @@ data class HomeUiState(
     val tips: List<HealthTip> = emptyList(),
     val challenges: List<Challenge> = emptyList(),
     val isLoading: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val showRatingDialog: Boolean = false,
+    val pendingOrderId: String? = null
 )
