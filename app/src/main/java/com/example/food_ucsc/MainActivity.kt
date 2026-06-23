@@ -4,12 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.screens.*
 import com.example.food_ucsc.ui.theme.FoodUCSC_Theme
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.HomeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +33,24 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) {
                         HomeScreen(navController = navController)
                     }
+                    composable(Screen.Explore.route) {
+                        ExploreScreen(navController = navController)
+                    }
+                    composable(Screen.AllCategories.route) {
+                        val viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+                        val uiState by viewModel.uiState.collectAsState()
+                        AllCategoriesScreen(navController = navController, categories = uiState.categories)
+                    }
                     composable(Screen.Category.route) { backStackEntry ->
                         val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
                         CategoryScreen(categoryName = categoryName, navController = navController)
+                    }
+                    composable(
+                        route = Screen.RestaurantDetail.route,
+                        arguments = listOf(navArgument("restaurantId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val restaurantId = backStackEntry.arguments?.getInt("restaurantId") ?: 0
+                        RestaurantDetailScreen(restaurantId = restaurantId, navController = navController)
                     }
                     composable(Screen.Profile.route) {
                         ProfileScreen(navController = navController)
