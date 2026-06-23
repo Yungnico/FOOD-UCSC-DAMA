@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.food_ucsc.ui.models.Category
 import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.state.HomeUiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,13 +20,13 @@ class HomeViewModel : ViewModel() {
 
     init {
         loadHomeData()
+        checkPendingRatings()
     }
 
     private fun loadHomeData() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             
-            // Simulación de carga de datos (esto vendría de un repositorio)
             val categories = listOf(
                 Category("Comida Rápida", Icons.Default.Fastfood),
                 Category("Saludable", Icons.Default.Restaurant),
@@ -56,6 +57,25 @@ class HomeViewModel : ViewModel() {
                 ) 
             }
         }
+    }
+
+    private fun checkPendingRatings() {
+        viewModelScope.launch {
+            // Simula esperar "unos minutos" (usaremos 5 segundos para la demo)
+            delay(5000)
+            
+            // Simula que existe un pedido pendiente de calificar
+            _uiState.update { 
+                it.copy(
+                    showRatingDialog = true,
+                    pendingOrderId = "101"
+                ) 
+            }
+        }
+    }
+
+    fun dismissRatingDialog() {
+        _uiState.update { it.copy(showRatingDialog = false) }
     }
 
     fun onSearchQueryChange(query: String) {

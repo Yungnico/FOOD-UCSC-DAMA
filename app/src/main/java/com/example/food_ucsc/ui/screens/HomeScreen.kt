@@ -39,6 +39,30 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    if (uiState.showRatingDialog && uiState.pendingOrderId != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissRatingDialog() },
+            title = { Text("¡Tu opinión nos importa!") },
+            text = { Text("¿Cómo estuvo tu último pedido? Ayúdanos a mejorar calificando tu experiencia.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val orderId = uiState.pendingOrderId!!
+                        viewModel.dismissRatingDialog()
+                        navController.navigate(Screen.Rating.createRoute(orderId))
+                    }
+                ) {
+                    Text("Calificar Ahora")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.dismissRatingDialog() }) {
+                    Text("Más tarde")
+                }
+            }
+        )
+    }
+
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
         containerColor = Color(0xFFFBF8FF)

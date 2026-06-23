@@ -8,5 +8,7 @@ data class HomeUiState(
     val recommendedItems: List<FoodItem> = emptyList(),
     val favoriteItems: List<FoodItem> = emptyList(),
     val isLoading: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val showRatingDialog: Boolean = false,
+    val pendingOrderId: String? = null
 )

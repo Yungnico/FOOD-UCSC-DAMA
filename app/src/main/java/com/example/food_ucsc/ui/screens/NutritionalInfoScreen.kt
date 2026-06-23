@@ -35,7 +35,7 @@ fun NutritionalInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Información Nutricional", fontWeight = FontWeight.Bold) },
+                title = { Text("Información nutricional", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
@@ -105,7 +105,7 @@ fun NutritionalInfoScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Comparación Semanal",
+                text = "Comparación semanal",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -162,7 +162,7 @@ fun NutritionalInfoScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Detalle por Productos Comprados",
+                text = "Detalle por productos comprados",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -171,10 +171,10 @@ fun NutritionalInfoScreen(
 
             // Placeholder for purchased items list
             val purchasedItems = listOf(
-                "Hamburguesa Clásica" to 550,
-                "Papas Fritas Medianas" to 320,
+                "Hamburguesa clásica" to 550,
+                "Papas fritas medianas" to 320,
                 "Bebida 500ml" to 210,
-                "Ensalada Caesar" to 350
+                "Ensalada caesar" to 350
             )
 
             purchasedItems.forEach { (name, cals) ->
