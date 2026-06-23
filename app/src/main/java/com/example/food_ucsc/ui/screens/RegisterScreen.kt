@@ -18,11 +18,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
 
     val moradoPrincipal = Color(0xFF6750A4)
     val fondoClaro = Color(0xFFFBF8FF)
@@ -30,9 +36,19 @@ fun RegisterScreen(navController: NavController) {
     val textoSecundario = Color(0xFF7A7A7A)
 
     var nombre by remember { mutableStateOf("") }
+    var apellidoPaterno by remember { mutableStateOf("") }
+    var apellidoMaterno by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var fechaNacimiento by remember { mutableStateOf("") }
+    val uiState by authViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.isAuthenticated) {
+        if (uiState.isAuthenticated) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -78,7 +94,7 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
-                    text = "Create new\nAccount",
+                    text = "Crear una nueva\ncuenta",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1D1D1D),
@@ -88,7 +104,7 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Already Registered? Log in here.",
+                    text = "¿Ya estás registrado? Inicia sesión aquí",
                     color = textoSecundario,
                     fontSize = 13.sp
                 )
@@ -96,7 +112,7 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(40.dp))
 
                 // NAME
-                InputLabel("NAME", textoSecundario)
+                InputLabel("NOMBRE", textoSecundario)
 
                 CustomTextField(
                     value = nombre,
@@ -106,8 +122,26 @@ fun RegisterScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(18.dp))
 
+                InputLabel("APELLIDO PATERNO", textoSecundario)
+                CustomTextField(
+                    value = apellidoPaterno,
+                    onValueChange = { apellidoPaterno = it },
+                    inputColor = inputColor
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                InputLabel("APELLIDO MATERNO", textoSecundario)
+                CustomTextField(
+                    value = apellidoMaterno,
+                    onValueChange = { apellidoMaterno = it },
+                    inputColor = inputColor
+                )
+
+                Spacer(modifier = Modifier.height(18.dp))
+
                 // EMAIL
-                InputLabel("EMAIL", textoSecundario)
+                InputLabel("CORREO", textoSecundario)
 
                 CustomTextField(
                     value = email,
@@ -119,7 +153,7 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // PASSWORD
-                InputLabel("PASSWORD", textoSecundario)
+                InputLabel("CONTRASEÑA", textoSecundario)
 
                 CustomTextField(
                     value = password,
@@ -131,24 +165,29 @@ fun RegisterScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // FECHA
-                InputLabel("DATE OF BIRTH", textoSecundario)
-
-                CustomTextField(
-                    value = fechaNacimiento,
-                    onValueChange = { fechaNacimiento = it },
-                    inputColor = inputColor
-                )
+                uiState.errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color(0xFFB3261E),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
                 Spacer(modifier = Modifier.height(30.dp))
 
                 Button(
                     onClick = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Register.route) {
-                                inclusive = true
-                            }
-                        }
+                        authViewModel.register(
+                            nombre = nombre,
+                            apellidoPaterno = apellidoPaterno,
+                            apellidoMaterno = apellidoMaterno,
+                            email = email,
+                            password = password
+                        )
                     },
+                    enabled = !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -157,12 +196,20 @@ fun RegisterScreen(navController: NavController) {
                         containerColor = moradoPrincipal
                     )
                 ) {
-                    Text(
-                        text = "Sign up",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Registrarse",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
         }

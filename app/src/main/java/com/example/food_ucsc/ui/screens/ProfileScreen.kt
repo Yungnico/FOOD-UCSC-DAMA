@@ -11,6 +11,8 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,12 +21,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val authUiState by authViewModel.uiState.collectAsState()
+    val displayName = authUiState.user?.nombre?.takeIf { it.isNotBlank() } ?: "Usuario UCSC"
+    val displayEmail = authUiState.user?.email ?: "usuario@ucsc.cl"
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,12 +79,12 @@ fun ProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "Usuario UCSC",
+                text = displayName,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "usuario@ucsc.cl",
+                text = displayEmail,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -104,7 +116,13 @@ fun ProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.weight(1f))
             
             Button(
-                onClick = { /* TODO: Logout */ },
+                onClick = {
+                    authViewModel.logout()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB3261E)),
                 shape = RoundedCornerShape(12.dp)

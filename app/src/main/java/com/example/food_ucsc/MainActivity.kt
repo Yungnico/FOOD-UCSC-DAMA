@@ -31,13 +31,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val app = application as FoodUcscApplication
+        val startDestination = if (app.container.sessionManager.isLoggedIn()) {
+            Screen.Home.route
+        } else {
+            Screen.Login.route
+        }
         setContent {
             FoodUCSC_Theme {
                 val navController = rememberNavController()
 
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Login.route
+                    startDestination = startDestination
                 ) {
                     composable(Screen.Login.route) {
                         LoginScreen(navController = navController)

@@ -16,11 +16,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.food_ucsc.navigation.Screen
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
 
     // Colores usados en HomeScreen
     val moradoPrincipal = Color(0xFF6750A4)
@@ -28,8 +34,17 @@ fun LoginScreen(navController: NavController) {
     val inputColor = Color(0xFFF3F0F8)
     val textoSecundario = Color(0xFF7A7A7A)
 
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val uiState by authViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.isAuthenticated) {
+        if (uiState.isAuthenticated) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -70,7 +85,7 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Login",
+                    text = "Bienvenido",
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
                     color = moradoPrincipal
@@ -79,7 +94,7 @@ fun LoginScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Sign in to continue.",
+                    text = "Inicia sesión para continuar",
                     color = textoSecundario,
                     fontSize = 15.sp
                 )
@@ -92,7 +107,7 @@ fun LoginScreen(navController: NavController) {
                 ) {
 
                     Text(
-                        text = "NAME",
+                        text = "CORREO",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = textoSecundario
@@ -101,8 +116,8 @@ fun LoginScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(6.dp))
 
                     TextField(
-                        value = username,
-                        onValueChange = { username = it },
+                        value = email,
+                        onValueChange = { email = it },
                         singleLine = true,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -130,7 +145,7 @@ fun LoginScreen(navController: NavController) {
                 ) {
 
                     Text(
-                        text = "PASSWORD",
+                        text = "CONTRASEÑA",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = textoSecundario
@@ -166,14 +181,21 @@ fun LoginScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(30.dp))
 
+                uiState.errorMessage?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color(0xFFB3261E),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 Button(
                     onClick = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) {
-                                inclusive = true
-                            }
-                        }
+                        authViewModel.login(email = email, password = password)
                     },
+                    enabled = !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -182,13 +204,20 @@ fun LoginScreen(navController: NavController) {
                         containerColor = moradoPrincipal
                     )
                 ) {
-
-                    Text(
-                        text = "Log in",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Iniciar sesión",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -197,7 +226,7 @@ fun LoginScreen(navController: NavController) {
                     onClick = { }
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = "¿Olvidaste tu contraseña?",
                         color = textoSecundario,
                         fontSize = 13.sp
                     )
@@ -209,7 +238,7 @@ fun LoginScreen(navController: NavController) {
                     }
                 ) {
                     Text(
-                        text = "Signup !",
+                        text = "¡Regístrate!",
                         color = moradoPrincipal,
                         fontWeight = FontWeight.Bold
                     )

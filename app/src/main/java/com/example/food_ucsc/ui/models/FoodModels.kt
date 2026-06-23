@@ -38,6 +38,17 @@ data class HealthTip(
     val categoria: String
 )
 
+data class AppUser(
+    val id: Int,
+    val nombre: String,
+    val apellidoPaterno: String,
+    val apellidoMaterno: String,
+    val email: String,
+    val objetivosSalud: String?,
+    val caloriasTarget: Int,
+    val puntos: Int
+)
+
 data class Challenge(
     val id: Int,
     val titulo: String,
