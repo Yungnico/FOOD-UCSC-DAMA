@@ -1,7 +1,9 @@
 package com.example.food_ucsc.navigation
 
 sealed class Screen(val route: String) {
+    object Login : Screen("login")
     object Home : Screen("home")
+    object Register : Screen("register")
     object Category : Screen("category/{categoryName}") {
         fun createRoute(categoryName: String) = "category/$categoryName"
     }

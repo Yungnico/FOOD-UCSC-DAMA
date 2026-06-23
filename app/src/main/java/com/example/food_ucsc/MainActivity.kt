@@ -16,8 +16,10 @@ import com.example.food_ucsc.ui.screens.AllCategoriesScreen
 import com.example.food_ucsc.ui.screens.CategoryScreen
 import com.example.food_ucsc.ui.screens.ExploreScreen
 import com.example.food_ucsc.ui.screens.HomeScreen
+import com.example.food_ucsc.ui.screens.LoginScreen // <-- Nueva Importación
 import com.example.food_ucsc.ui.screens.NutritionalInfoScreen
 import com.example.food_ucsc.ui.screens.ProfileScreen
+import com.example.food_ucsc.ui.screens.RegisterScreen
 import com.example.food_ucsc.ui.screens.RestaurantDetailScreen
 import com.example.food_ucsc.ui.theme.FoodUCSC_Theme
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
@@ -30,14 +32,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             FoodUCSC_Theme {
                 val navController = rememberNavController()
-                
+
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Home.route
+                    startDestination = Screen.Login.route
                 ) {
+                    composable(Screen.Login.route) {
+                        LoginScreen(navController = navController)
+                    }
+                    composable(Screen.Register.route) {
+                        RegisterScreen(navController = navController)
+                    }
                     composable(Screen.Home.route) {
                         HomeScreen(navController = navController)
                     }
+
                     composable(Screen.Category.route) { backStackEntry ->
                         val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
                         CategoryScreen(categoryName = categoryName, navController = navController)
