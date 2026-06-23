@@ -2,6 +2,42 @@ package com.example.food_ucsc.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+data class LoginRequestDto(
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String
+)
+
+data class RegisterRequestDto(
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("apellido_paterno") val apellidoPaterno: String? = null,
+    @SerializedName("apellido_materno") val apellidoMaterno: String? = null,
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("objetivos_salud") val objetivosSalud: String? = null,
+    @SerializedName("calorias_target") val caloriasTarget: Int? = null
+)
+
+data class UserDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("apellido_paterno") val apellidoPaterno: String,
+    @SerializedName("apellido_materno") val apellidoMaterno: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("objetivos_salud") val objetivosSalud: String? = null,
+    @SerializedName("calorias_target") val caloriasTarget: Int = 0,
+    @SerializedName("puntos") val puntos: Int = 0
+)
+
+data class AuthResponseDto(
+    @SerializedName("token") val token: String,
+    @SerializedName("token_type") val tokenType: String,
+    @SerializedName("user") val user: UserDto
+)
+
+data class SimpleMessageDto(
+    @SerializedName("message") val message: String
+)
+
 data class RestaurantDto(
     @SerializedName("id") val id: Int,
     @SerializedName("nombre") val nombre: String,

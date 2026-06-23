@@ -9,6 +9,8 @@ import com.example.food_ucsc.data.remote.dto.FoodItemDto
 import com.example.food_ucsc.data.remote.dto.MenuDto
 import com.example.food_ucsc.data.remote.dto.RestaurantDto
 import com.example.food_ucsc.data.remote.dto.TipDto
+import com.example.food_ucsc.data.remote.dto.UserDto
+import com.example.food_ucsc.ui.models.AppUser
 import com.example.food_ucsc.ui.models.Challenge
 import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.models.HealthTip
@@ -72,5 +74,18 @@ fun ChallengeDto.toDomain(): Challenge {
         titulo = this.titulo,
         descripcion = this.descripcion,
         recompensaPuntos = this.recompensaPuntos
+    )
+}
+
+fun UserDto.toDomain(): AppUser {
+    return AppUser(
+        id = this.id,
+        nombre = this.nombre,
+        apellidoPaterno = this.apellidoPaterno,
+        apellidoMaterno = this.apellidoMaterno,
+        email = this.email,
+        objetivosSalud = this.objetivosSalud,
+        caloriasTarget = this.caloriasTarget,
+        puntos = this.puntos
     )
 }
