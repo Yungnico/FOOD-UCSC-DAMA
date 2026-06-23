@@ -23,6 +23,12 @@ object AppViewModelProvider {
                 foodUcscApplication().container.foodRepository
             )
         }
+        initializer {
+            AuthViewModel(
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
+            )
+        }
     }
 }
 
