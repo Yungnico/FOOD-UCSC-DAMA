@@ -10,6 +10,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,33 +19,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.models.Order
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.OrderHistoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderHistoryScreen(navController: NavController) {
-    // Mock data for orders
-    val orders = listOf(
-        Order(
-            id = "101",
-            restaurantName = "Burger UCSC",
-            date = "24 May 2024",
-            total = 8500.0,
-            status = "Entregado",
-            items = listOf("Hamburguesa Clásica", "Papas Fritas"),
-            isRated = false
-        ),
-        Order(
-            id = "102",
-            restaurantName = "Pizza Palace",
-            date = "22 May 2024",
-            total = 12000.0,
-            status = "Entregado",
-            items = listOf("Pizza Pepperoni Familiar"),
-            isRated = true
-        )
-    )
+fun OrderHistoryScreen(
+    navController: NavController,
+    viewModel: OrderHistoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -59,22 +48,65 @@ fun OrderHistoryScreen(navController: NavController) {
         },
         containerColor = Color(0xFFFBF8FF)
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(orders) { order ->
-                OrderItemCard(order = order)
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            uiState.error != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.error ?: "No se pudo cargar el historial",
+                        color = Color(0xFFB3261E),
+                        modifier = Modifier.padding(24.dp)
+                    )
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if (uiState.orders.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Todavía no tienes compras registradas.",
+                                color = Color.Gray,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    } else {
+                        items(uiState.orders) { order ->
+                            OrderItemCard(
+                                order = order,
+                                onRateClick = {
+                                    navController.navigate(Screen.Rating.createRoute(order.id))
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun OrderItemCard(order: Order) {
+fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -147,6 +179,10 @@ fun OrderItemCard(order: Order) {
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
+                } else {
+                    TextButton(onClick = onRateClick) {
+                        Text("Calificar")
+                    }
                 }
             }
         }

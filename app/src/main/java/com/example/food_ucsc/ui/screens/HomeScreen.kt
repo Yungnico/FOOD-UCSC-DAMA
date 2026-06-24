@@ -108,12 +108,12 @@ fun Header() {
             modifier = Modifier
                 .size(width = 80.dp, height = 64.dp)
                 .clip(RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
-                .background(Color(0xFF6750A4)),
+                .background(Color(0xFFF59E0B)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.Whatshot,
-                contentDescription = "Logo",
+                imageVector = Icons.Default.RestaurantMenu,
+                contentDescription = "Menú de comida",
                 tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
@@ -139,7 +139,7 @@ fun Header() {
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
-                    imageVector = Icons.Default.Menu,
+                    imageVector = Icons.Default.RestaurantMenu,
                     contentDescription = stringResource(R.string.menu),
                     tint = Color.Gray,
                     modifier = Modifier.size(24.dp)

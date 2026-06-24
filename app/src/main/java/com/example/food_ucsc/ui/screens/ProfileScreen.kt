@@ -36,6 +36,10 @@ fun ProfileScreen(
     val authUiState by authViewModel.uiState.collectAsState()
     val displayName = authUiState.user?.nombre?.takeIf { it.isNotBlank() } ?: "Usuario UCSC"
     val displayEmail = authUiState.user?.email ?: "usuario@ucsc.cl"
+    val userPoints = authUiState.user?.puntos ?: 0
+    val calorieTarget = authUiState.user?.caloriasTarget ?: 2200
+    val objectives = authUiState.user?.objetivosSalud ?: "Sin objetivo definido"
+    val calorieProgress = (userPoints.coerceAtMost(calorieTarget)).toFloat() / calorieTarget.toFloat()
 
     Scaffold(
         topBar = {
@@ -65,14 +69,14 @@ fun ProfileScreen(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFEADDFF)),
+                    .background(Color(0xFFFDE68A)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = Icons.Default.RestaurantMenu,
                     contentDescription = null,
                     modifier = Modifier.size(60.dp),
-                    tint = Color(0xFF21005D)
+                    tint = Color(0xFF92400E)
                 )
             }
             
@@ -88,6 +92,45 @@ fun ProfileScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = Color(0xFFF3F0F8)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Puntos acumulados",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFF6750A4)
+                    )
+                    Text(
+                        text = "$userPoints pts",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { calorieProgress.coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color(0xFF6750A4),
+                        trackColor = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Objetivo de salud: $objectives",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.DarkGray
+                    )
+                    Text(
+                        text = "Meta calórica diaria: $calorieTarget kcal",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+            }
             
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -107,9 +150,9 @@ fun ProfileScreen(
             )
             
             ProfileMenuItem(
-                icon = Icons.Default.Settings,
-                title = "Configuración",
-                subtitle = "Cuenta, notificaciones y más",
+                icon = Icons.Default.RestaurantMenu,
+                title = "Preferencias alimentarias",
+                subtitle = "Alergias, gustos y alertas de comida",
                 onClick = { /* TODO */ }
             )
             

@@ -1,25 +1,73 @@
 package com.example.food_ucsc.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.food_ucsc.ui.models.NutritionalData
+import androidx.lifecycle.viewModelScope
+import com.example.food_ucsc.data.local.SessionManager
+import com.example.food_ucsc.data.repository.FoodRepository
+import com.example.food_ucsc.ui.state.NutritionalInfoUiState
+import com.example.food_ucsc.ui.state.NutritionalPurchaseItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class NutritionalInfoViewModel : ViewModel() {
-    private val _dailyCalories = MutableStateFlow(1850)
-    val dailyCalories: StateFlow<Int> = _dailyCalories.asStateFlow()
+class NutritionalInfoViewModel(
+    private val repository: FoodRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
 
-    private val _weeklyData = MutableStateFlow(listOf(
-        NutritionalData("Lun", 2100),
-        NutritionalData("Mar", 1950),
-        NutritionalData("Mié", 2300),
-        NutritionalData("Jue", 1800),
-        NutritionalData("Vie", 2400),
-        NutritionalData("Sáb", 2000),
-        NutritionalData("Dom", 1850)
-    ))
-    val weeklyData: StateFlow<List<NutritionalData>> = _weeklyData.asStateFlow()
+    private val _uiState = MutableStateFlow(NutritionalInfoUiState())
+    val uiState: StateFlow<NutritionalInfoUiState> = _uiState.asStateFlow()
 
-    val calorieGoal = 2200
+    init {
+        loadNutritionSummary()
+    }
+
+    private fun loadNutritionSummary() {
+        val token = sessionManager.getToken()
+        if (token.isNullOrBlank()) {
+            _uiState.update { it.copy(error = "No hay una sesión activa") }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            runCatching {
+                repository.getNutritionSummary(token)
+            }.onSuccess { summary ->
+                val weeklyData = summary.weeklyData.map { day ->
+                    com.example.food_ucsc.ui.models.NutritionalData(
+                        date = day.date,
+                        calories = day.calories
+                    )
+                }
+
+                val purchasedItems = summary.purchasedItems.map { purchase ->
+                    NutritionalPurchaseItem(
+                        name = purchase.name,
+                        calories = purchase.calories
+                    )
+                }
+
+                _uiState.update {
+                    it.copy(
+                        dailyCalories = summary.dailyCalories,
+                        calorieGoal = summary.calorieGoal,
+                        weeklyData = weeklyData,
+                        purchasedItems = purchasedItems,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+            }.onFailure { ex ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = ex.message ?: "No se pudo cargar la información nutricional"
+                    )
+                }
+            }
+        }
+    }
 }

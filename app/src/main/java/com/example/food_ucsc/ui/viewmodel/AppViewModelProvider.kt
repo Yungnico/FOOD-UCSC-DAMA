@@ -10,7 +10,8 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             HomeViewModel(
-                foodUcscApplication().container.foodRepository
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
             )
         }
         initializer {
@@ -21,6 +22,29 @@ object AppViewModelProvider {
         initializer {
             CategoryViewModel(
                 foodUcscApplication().container.foodRepository
+            )
+        }
+        initializer {
+            ExploreViewModel(
+                foodUcscApplication().container.foodRepository
+            )
+        }
+        initializer {
+            OrderHistoryViewModel(
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
+            )
+        }
+        initializer {
+            NutritionalInfoViewModel(
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
+            )
+        }
+        initializer {
+            RatingViewModel(
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
             )
         }
         initializer {

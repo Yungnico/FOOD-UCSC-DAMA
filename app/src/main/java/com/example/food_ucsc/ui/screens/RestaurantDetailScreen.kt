@@ -62,6 +62,14 @@ fun RestaurantDetailScreen(
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
+        } else if (uiState.error != null) {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                Text(
+                    text = uiState.error ?: "No se pudo cargar el detalle del local",
+                    color = Color(0xFFB3261E),
+                    modifier = Modifier.padding(24.dp)
+                )
+            }
         } else if (uiState.restaurant != null) {
             LazyColumn(
                 modifier = Modifier

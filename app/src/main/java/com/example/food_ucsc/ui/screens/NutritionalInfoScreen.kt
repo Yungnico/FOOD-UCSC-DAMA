@@ -20,17 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.NutritionalInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NutritionalInfoScreen(
     navController: NavController,
-    viewModel: NutritionalInfoViewModel = viewModel()
+    viewModel: NutritionalInfoViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val dailyCalories by viewModel.dailyCalories.collectAsState()
-    val weeklyData by viewModel.weeklyData.collectAsState()
-    val calorieGoal = viewModel.calorieGoal
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -53,7 +52,14 @@ fun NutritionalInfoScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Summary Card
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error ?: "No se pudo cargar la información nutricional",
+                    color = Color(0xFFB3261E),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -76,14 +82,14 @@ fun NutritionalInfoScreen(
                         fontSize = 16.sp
                     )
                     Text(
-                        text = "$dailyCalories kcal",
+                        text = "${uiState.dailyCalories} kcal",
                         color = Color.White,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    
-                    val progress = (dailyCalories.toFloat() / calorieGoal.toFloat()).coerceIn(0f, 1f)
+
+                    val progress = (uiState.dailyCalories.toFloat() / uiState.calorieGoal.toFloat()).coerceIn(0f, 1f)
                     LinearProgressIndicator(
                         progress = { progress },
                         modifier = Modifier
@@ -95,7 +101,7 @@ fun NutritionalInfoScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Meta diaria: $calorieGoal kcal",
+                        text = "Meta diaria: ${uiState.calorieGoal} kcal",
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
@@ -128,9 +134,9 @@ fun NutritionalInfoScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    val maxVal = (weeklyData.maxOfOrNull { it.calories } ?: calorieGoal).coerceAtLeast(1)
+                    val maxVal = (uiState.weeklyData.maxOfOrNull { it.calories } ?: uiState.calorieGoal).coerceAtLeast(1)
                     
-                    weeklyData.forEach { data ->
+                    uiState.weeklyData.forEach { data ->
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Bottom,
@@ -144,7 +150,7 @@ fun NutritionalInfoScreen(
                                     .height(barHeight)
                                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                                     .background(
-                                        if (data.calories > calorieGoal) Color(0xFFB3261E) 
+                                        if (data.calories > uiState.calorieGoal) Color(0xFFB3261E)
                                         else Color(0xFFEADDFF)
                                     )
                             )
@@ -169,39 +175,39 @@ fun NutritionalInfoScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Placeholder for purchased items list
-            val purchasedItems = listOf(
-                "Hamburguesa clásica" to 550,
-                "Papas fritas medianas" to 320,
-                "Bebida 500ml" to 210,
-                "Ensalada caesar" to 350
-            )
-
-            purchasedItems.forEach { (name, cals) ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF6750A4))
+            if (uiState.purchasedItems.isEmpty()) {
+                Text(
+                    text = "Aún no hay compras registradas para mostrar.",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            } else {
+                uiState.purchasedItems.forEach { item ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF6750A4))
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(text = item.name, fontSize = 16.sp)
+                        }
+                        Text(
+                            text = "${item.calories} kcal",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF6750A4)
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(text = name, fontSize = 16.sp)
                     }
-                    Text(
-                        text = "$cals kcal",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6750A4)
-                    )
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                 }
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
             }
         }
     }

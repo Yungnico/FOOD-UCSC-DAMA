@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.RatingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,9 +27,13 @@ import com.example.food_ucsc.ui.viewmodel.RatingViewModel
 fun RatingScreen(
     navController: NavController,
     orderId: String,
-    viewModel: RatingViewModel = viewModel()
+    viewModel: RatingViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(orderId) {
+        orderId.toIntOrNull()?.let { viewModel.setPurchaseId(it) }
+    }
 
     if (uiState.isSubmitted) {
         AlertDialog(
@@ -54,6 +59,15 @@ fun RatingScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
             )
+
+            uiState.errorMessage?.let { error ->
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = error,
+                    color = Color(0xFFB3261E),
+                    fontSize = 12.sp
+                )
+            }
         },
         containerColor = Color(0xFFFBF8FF)
     ) { innerPadding ->
@@ -113,9 +127,13 @@ fun RatingScreen(
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6750A4)),
-                enabled = uiState.orderRating > 0 && uiState.restaurantRating > 0
+                enabled = uiState.orderRating > 0 && uiState.restaurantRating > 0 && !uiState.isLoading
             ) {
-                Text("Enviar calificación", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Text("Enviar calificación", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
     }

@@ -23,84 +23,19 @@ import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.components.BottomNavBar
 import com.example.food_ucsc.ui.components.RestaurantCard
-import com.example.food_ucsc.ui.models.Restaurant
+import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
+import com.example.food_ucsc.ui.viewmodel.ExploreViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(navController: NavController) {
-    var searchQuery by remember { mutableStateOf("") }
-    
-    // Datos de ejemplo para los locales actualizados con los nuevos atributos
-    val restaurants = listOf(
-        Restaurant(
-            id = 1,
-            nombre = "Casino Central",
-            descripcion = "Almuerzos y colaciones",
-            horario = "08:00 - 18:00",
-            contacto = "+56 41 273 5000",
-            latitude = -36.801,
-            longitude = -73.013,
-            tiempo_espera_estimado = 15,
-            rating = 4.5,
-            icon = Icons.Default.Restaurant,
-            bannerColor = 0xFF6750A4
-        ),
-        Restaurant(
-            id = 2,
-            nombre = "Cafetería Biblioteca",
-            descripcion = "Café, snacks y sándwiches",
-            horario = "09:00 - 20:00",
-            contacto = "cafeteria@ucsc.cl",
-            latitude = -36.802,
-            longitude = -73.014,
-            tiempo_espera_estimado = 8,
-            rating = 4.8,
-            icon = Icons.Default.Coffee,
-            bannerColor = 0xFF3F51B5
-        ),
-        Restaurant(
-            id = 3,
-            nombre = "Kiosko Saludable",
-            descripcion = "Ensaladas y jugos naturales",
-            horario = "09:00 - 17:00",
-            contacto = "N/A",
-            latitude = -36.803,
-            longitude = -73.015,
-            tiempo_espera_estimado = 12,
-            rating = 4.2,
-            icon = Icons.Default.Grass,
-            bannerColor = 0xFF4CAF50
-        ),
-        Restaurant(
-            id = 4,
-            nombre = "Pizzería Express",
-            descripcion = "Pizzas y comida rápida",
-            horario = "11:00 - 16:00",
-            contacto = "pizzeria@ucsc.cl",
-            latitude = -36.804,
-            longitude = -73.016,
-            tiempo_espera_estimado = 25,
-            rating = 4.0,
-            icon = Icons.Default.LocalPizza,
-            bannerColor = 0xFFFF9800
-        ),
-        Restaurant(
-            id = 5,
-            nombre = "Dulce Tentación",
-            descripcion = "Pasteles y repostería",
-            horario = "10:00 - 19:00",
-            contacto = "+56 9 1234 5678",
-            latitude = -36.805,
-            longitude = -73.017,
-            tiempo_espera_estimado = 5,
-            rating = 4.7,
-            icon = Icons.Default.Cake,
-            bannerColor = 0xFFE91E63
-        )
-    )
+fun ExploreScreen(
+    navController: NavController,
+    viewModel: ExploreViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val filters = listOf("Todos", "Cerca", "Populares", "Baratos", "Saludables")
-    var selectedFilter by remember { mutableStateOf("Todos") }
+    val filters = listOf("Todos", "Cerca", "Rápidos", "Populares", "Abierto ahora")
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
@@ -112,25 +47,23 @@ fun ExploreScreen(navController: NavController) {
                 .padding(innerPadding)
         ) {
             // Buscador (Estético)
-            PaddingValues(16.dp).let { padding ->
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    placeholder = { Text(stringResource(R.string.search)) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
-                    shape = RoundedCornerShape(28.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF3F0F8),
-                        unfocusedContainerColor = Color(0xFFF3F0F8),
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent
-                    )
+            OutlinedTextField(
+                value = uiState.searchQuery,
+                onValueChange = viewModel::onSearchQueryChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text(stringResource(R.string.search)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
+                shape = RoundedCornerShape(28.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFFF3F0F8),
+                    unfocusedContainerColor = Color(0xFFF3F0F8),
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent
                 )
-            }
+            )
 
             // Filtros
             LazyRow(
@@ -141,8 +74,8 @@ fun ExploreScreen(navController: NavController) {
             ) {
                 items(filters) { filter ->
                     FilterChip(
-                        selected = selectedFilter == filter,
-                        onClick = { selectedFilter = filter },
+                        selected = uiState.selectedFilter == filter,
+                        onClick = { viewModel.onFilterChange(filter) },
                         label = { Text(filter) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Color(0xFFEADDFF),
@@ -153,6 +86,15 @@ fun ExploreScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            uiState.error?.let { error ->
+                Text(
+                    text = error,
+                    color = Color(0xFFB3261E),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Lista de Locales
             Text(
@@ -167,7 +109,7 @@ fun ExploreScreen(navController: NavController) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(restaurants) { restaurant ->
+                items(uiState.filteredRestaurants) { restaurant ->
                     RestaurantCard(restaurant = restaurant, onClick = {
                         navController.navigate(Screen.RestaurantDetail.createRoute(restaurant.id))
                     })

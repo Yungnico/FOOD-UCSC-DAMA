@@ -34,6 +34,25 @@ data class AuthResponseDto(
     @SerializedName("user") val user: UserDto
 )
 
+data class NutritionSummaryDayDto(
+    @SerializedName("date") val date: String,
+    @SerializedName("calories") val calories: Int
+)
+
+data class NutritionSummaryItemDto(
+    @SerializedName("name") val name: String,
+    @SerializedName("calories") val calories: Int,
+    @SerializedName("local") val local: String? = null,
+    @SerializedName("date") val date: String? = null
+)
+
+data class NutritionSummaryDto(
+    @SerializedName("daily_calories") val dailyCalories: Int,
+    @SerializedName("calorie_goal") val calorieGoal: Int,
+    @SerializedName("weekly_data") val weeklyData: List<NutritionSummaryDayDto> = emptyList(),
+    @SerializedName("purchased_items") val purchasedItems: List<NutritionSummaryItemDto> = emptyList()
+)
+
 data class SimpleMessageDto(
     @SerializedName("message") val message: String
 )
@@ -86,4 +105,84 @@ data class ChallengeDto(
     @SerializedName("titulo") val titulo: String,
     @SerializedName("descripcion") val descripcion: String,
     @SerializedName("recompensa_puntos") val recompensaPuntos: Int
+)
+
+data class LocalSummaryDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String
+)
+
+data class ProductSummaryDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("descripcion") val descripcion: String? = null,
+    @SerializedName(value = "informacion_nutricional", alternate = ["informacionNutricional"]) val informacionNutricional: NutritionDetailDto? = null
+)
+
+data class NutritionDetailDto(
+    @SerializedName("calorias") val calorias: Int = 0,
+    @SerializedName("proteina") val proteina: Double = 0.0,
+    @SerializedName("carbohidratos") val carbohidratos: Double = 0.0,
+    @SerializedName("grasas") val grasas: Double = 0.0,
+    @SerializedName("sodio") val sodio: Double = 0.0,
+    @SerializedName("puntaje") val puntaje: Double = 0.0
+)
+
+data class MenuSummaryDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("local_id") val localId: Int,
+    @SerializedName("titulo") val titulo: String? = null,
+    @SerializedName("local") val local: LocalSummaryDto? = null
+)
+
+data class MenuProductSummaryDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("menu_id") val menuId: Int,
+    @SerializedName("producto_id") val productoId: Int,
+    @SerializedName("precio_venta") val precioVenta: Double,
+    @SerializedName("disponible") val disponible: Boolean,
+    @SerializedName("menu") val menu: MenuSummaryDto? = null,
+    @SerializedName("producto") val producto: ProductSummaryDto? = null
+)
+
+data class PurchaseDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("usuario_id") val usuarioId: Int,
+    @SerializedName("menu_producto_id") val menuProductoId: Int,
+    @SerializedName("fecha_compra") val fechaCompra: String,
+    @SerializedName("calificacion") val calificacion: Int? = null,
+    @SerializedName(value = "menu_producto", alternate = ["menuProducto"]) val menuProducto: MenuProductSummaryDto? = null
+)
+
+data class PurchaseRegistrationRequestDto(
+    @SerializedName("menu_producto_id") val menuProductoId: Int,
+    @SerializedName("calificacion") val calificacion: Int? = null
+)
+
+data class PurchaseRatingUpdateDto(
+    @SerializedName("calificacion") val calificacion: Int
+)
+
+data class CategoryDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String
+)
+
+data class ProductMenuDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("local_id") val localId: Int,
+    @SerializedName("fecha") val fecha: String,
+    @SerializedName("titulo") val titulo: String,
+    @SerializedName("promociones") val promociones: String
+)
+
+data class ProductDetailDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("descripcion") val descripcion: String,
+    @SerializedName("categoria_basica") val categoriaBasica: String,
+    @SerializedName("stock") val stock: Int,
+    @SerializedName("precio_base") val precioBase: Double,
+    @SerializedName("menus") val menus: List<ProductMenuDto> = emptyList(),
+    @SerializedName("categorias") val categorias: List<CategoryDto> = emptyList()
 )
