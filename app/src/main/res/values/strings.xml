@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Food_UCSC</string>
-    <string name="start_here">Busca aquí ...</string>
-    <string name="menu">Menu</string>
-    <string name="search">Buscar</string>
+    <string name="start_here">Busca tu próxima comida</string>
+    <string name="menu">Explorar menú</string>
+    <string name="search">Buscar platos</string>
     <string name="category">Categorias</string>
     <string name="recommended">Recomendados</string>
     <string name="favorite">Favoritos</string>
