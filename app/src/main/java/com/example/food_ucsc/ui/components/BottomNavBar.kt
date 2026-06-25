@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.food_ucsc.navigation.Screen
 
@@ -48,7 +49,11 @@ fun BottomNavBar(navController: NavController) {
             ) {
                 if (currentRoute != Screen.Home.route) {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
             }
@@ -58,7 +63,13 @@ fun BottomNavBar(navController: NavController) {
                 isActive = currentRoute == Screen.Explore.route
             ) {
                 if (currentRoute != Screen.Explore.route) {
-                    navController.navigate(Screen.Explore.route)
+                    navController.navigate(Screen.Explore.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             }
             NavItem(
@@ -67,7 +78,13 @@ fun BottomNavBar(navController: NavController) {
                 isActive = currentRoute == Screen.Profile.route
             ) {
                 if (currentRoute != Screen.Profile.route) {
-                    navController.navigate(Screen.Profile.route)
+                    navController.navigate(Screen.Profile.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
             }
         }

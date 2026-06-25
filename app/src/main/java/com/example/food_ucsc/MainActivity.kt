@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -17,7 +18,7 @@ import com.example.food_ucsc.ui.screens.AllCategoriesScreen
 import com.example.food_ucsc.ui.screens.CategoryScreen
 import com.example.food_ucsc.ui.screens.ExploreScreen
 import com.example.food_ucsc.ui.screens.HomeScreen
-import com.example.food_ucsc.ui.screens.LoginScreen // <-- Nueva Importación
+import com.example.food_ucsc.ui.screens.LoginScreen
 import com.example.food_ucsc.ui.screens.NutritionalInfoScreen
 import com.example.food_ucsc.ui.screens.ProfileScreen
 import com.example.food_ucsc.ui.screens.RegisterScreen
@@ -58,8 +59,15 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Explore.route) {
                         ExploreScreen(navController = navController)
                     }
-                    composable(Screen.AllCategories.route) {
-                        val viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+                    composable(Screen.AllCategories.route) { backStackEntry ->
+                        // Compartimos el ViewModel de la pantalla Home para no recargar datos
+                        val parentEntry = remember(backStackEntry) {
+                            navController.getBackStackEntry(Screen.Home.route)
+                        }
+                        val viewModel: HomeViewModel = viewModel(
+                            viewModelStoreOwner = parentEntry,
+                            factory = AppViewModelProvider.Factory
+                        )
                         val uiState by viewModel.uiState.collectAsState()
                         AllCategoriesScreen(navController = navController, categories = uiState.categories)
                     }

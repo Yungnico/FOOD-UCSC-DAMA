@@ -53,7 +53,7 @@ fun ExploreScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text(stringResource(R.string.search)) },
+                placeholder = { Text(stringResource(R.string.search_locales)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
                 shape = RoundedCornerShape(28.dp),

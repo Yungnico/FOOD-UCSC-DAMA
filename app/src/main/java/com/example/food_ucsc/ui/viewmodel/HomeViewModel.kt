@@ -30,6 +30,9 @@ class HomeViewModel(
     }
 
     private fun loadHomeData() {
+        // Evitar recargar si ya tenemos datos cargados
+        if (_uiState.value.categories.isNotEmpty()) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 

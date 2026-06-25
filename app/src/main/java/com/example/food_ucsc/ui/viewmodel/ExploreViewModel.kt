@@ -22,6 +22,9 @@ class ExploreViewModel(
     }
 
     private fun loadRestaurants() {
+        // EVITAR RECARGA: Si ya tenemos datos, no volvemos a llamar a la API
+        if (_uiState.value.restaurants.isNotEmpty()) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
