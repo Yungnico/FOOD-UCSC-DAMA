@@ -40,14 +40,9 @@ class HomeViewModel(
                         .getOrDefault(emptyList())
                 }
 
-                val categories = listOf(
-                    Category("Económica", Icons.Default.AttachMoney),
-                    Category("Vegetariana", Icons.Default.Grass),
-                    Category("Vegana", Icons.Default.Eco),
-                    Category("Casera", Icons.Default.Home),
-                    Category("Sin gluten", Icons.Default.BakeryDining),
-                    Category("Saludable", Icons.Default.Restaurant)
-                )
+                // Llamada a la API a través del repositorio para obtener las categorías
+                val categories = runCatching { foodRepository.getCategories() }
+                    .getOrDefault(emptyList())
 
                 val recommended = menus
                     .flatMap { it.productos }
@@ -83,20 +78,9 @@ class HomeViewModel(
             }.onFailure {
                 _uiState.update {
                     it.copy(
-                        categories = listOf(
-                            Category("Económica", Icons.Default.AttachMoney),
-                            Category("Vegetariana", Icons.Default.Grass),
-                            Category("Vegana", Icons.Default.Eco),
-                            Category("Casera", Icons.Default.Home),
-                            Category("Sin gluten", Icons.Default.BakeryDining),
-                            Category("Saludable", Icons.Default.Restaurant)
-                        ),
+                        categories = emptyList(),
                         recommendedItems = emptyList(),
                         favoriteItems = emptyList(),
-                        tips = listOf(
-                            HealthTip(1, "Mantén una hidratación constante durante el día.", "hidratacion")
-                        ),
-                        challenges = emptyList(),
                         isLoading = false
                     )
                 }
@@ -106,15 +90,12 @@ class HomeViewModel(
 
     private fun checkPendingRatings() {
         viewModelScope.launch {
-            // Simula esperar "unos minutos" (usaremos 5 segundos para la demo)
             delay(5000)
-            
-            // Simula que existe un pedido pendiente de calificar
-            _uiState.update { 
+            _uiState.update {
                 it.copy(
                     showRatingDialog = true,
                     pendingOrderId = "101"
-                ) 
+                )
             }
         }
     }

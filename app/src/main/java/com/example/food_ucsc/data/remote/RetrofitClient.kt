@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    // Reemplazar http://10.0.2.2:8000/api/ por http://IPV4_DE_TU_PC:8000/api/
+    // Reemplazar -> http://10.0.2.2:8000/api/ por http://IPV4_DE_TU_PC:8000/api/
     private const val BASE_URL = "http://10.0.2.2:8000/api/"
 
     private val retrofit: Retrofit by lazy {
