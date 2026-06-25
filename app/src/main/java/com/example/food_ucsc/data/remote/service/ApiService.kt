@@ -18,7 +18,6 @@ import com.example.food_ucsc.data.remote.dto.TipDto
 import com.example.food_ucsc.data.remote.dto.UserDto
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -46,26 +45,24 @@ interface ApiService {
     suspend fun register(@Body request: RegisterRequestDto): AuthResponseDto
 
     @GET("me")
-    suspend fun me(@Header("Authorization") authorization: String): UserDto
+    suspend fun me(): UserDto
 
     @GET("me/resumen-nutricional")
-    suspend fun getNutritionSummary(@Header("Authorization") authorization: String): NutritionSummaryDto
+    suspend fun getNutritionSummary(): NutritionSummaryDto
 
     @POST("logout")
-    suspend fun logout(@Header("Authorization") authorization: String): SimpleMessageDto
+    suspend fun logout(): SimpleMessageDto
 
     @GET("compras")
-    suspend fun getMyPurchases(@Header("Authorization") authorization: String): List<PurchaseDto>
+    suspend fun getMyPurchases(): List<PurchaseDto>
 
     @POST("compras/registrar")
     suspend fun registerPurchase(
-        @Header("Authorization") authorization: String,
         @Body request: PurchaseRegistrationRequestDto
     ): Map<String, Any>
 
     @PUT("compras/{id}")
     suspend fun updatePurchaseRating(
-        @Header("Authorization") authorization: String,
         @Path("id") purchaseId: Int,
         @Body request: PurchaseRatingUpdateDto
     ): PurchaseDto
@@ -74,7 +71,7 @@ interface ApiService {
     suspend fun getFavoritesByUser(@Path("id") userId: Int): List<FavoriteDto>
 
     @GET("favoritos/mios")
-    suspend fun getMyFavorites(@Header("Authorization") authorization: String): List<FavoriteDto>
+    suspend fun getMyFavorites(): List<FavoriteDto>
 
     @GET("consejos")
     suspend fun getTips(): List<TipDto>

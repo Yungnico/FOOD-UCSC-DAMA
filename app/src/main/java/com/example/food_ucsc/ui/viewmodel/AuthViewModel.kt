@@ -101,7 +101,7 @@ class AuthViewModel(
         }
 
         viewModelScope.launch {
-            runCatching { repository.me(token) }
+            runCatching { repository.me() }
                 .onSuccess { user ->
                     sessionManager.saveSession(token, user.id)
                     _uiState.update {
@@ -129,7 +129,7 @@ class AuthViewModel(
         val token = sessionManager.getToken()
         viewModelScope.launch {
             if (!token.isNullOrBlank()) {
-                runCatching { repository.logout(token) }
+                runCatching { repository.logout() }
             }
             sessionManager.clearSession()
             _uiState.update {

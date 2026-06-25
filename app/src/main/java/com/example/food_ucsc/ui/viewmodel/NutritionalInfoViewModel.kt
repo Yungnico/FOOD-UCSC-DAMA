@@ -2,7 +2,6 @@ package com.example.food_ucsc.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.food_ucsc.data.local.SessionManager
 import com.example.food_ucsc.data.repository.FoodRepository
 import com.example.food_ucsc.ui.state.NutritionalInfoUiState
 import com.example.food_ucsc.ui.state.NutritionalPurchaseItem
@@ -13,8 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class NutritionalInfoViewModel(
-    private val repository: FoodRepository,
-    private val sessionManager: SessionManager
+    private val repository: FoodRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NutritionalInfoUiState())
@@ -25,16 +23,10 @@ class NutritionalInfoViewModel(
     }
 
     private fun loadNutritionSummary() {
-        val token = sessionManager.getToken()
-        if (token.isNullOrBlank()) {
-            _uiState.update { it.copy(error = "No hay una sesión activa") }
-            return
-        }
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
-                repository.getNutritionSummary(token)
+                repository.getNutritionSummary()
             }.onSuccess { summary ->
                 val weeklyData = summary.weeklyData.map { day ->
                     com.example.food_ucsc.ui.models.NutritionalData(

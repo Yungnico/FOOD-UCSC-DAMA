@@ -55,8 +55,8 @@ class FoodRepository(private val apiService: ApiService) {
             .mapNotNull { it.toDomainOrNull() }
     }
 
-    suspend fun getMyFavorites(token: String) = withContext(Dispatchers.IO) {
-        apiService.getMyFavorites("Bearer $token")
+    suspend fun getMyFavorites() = withContext(Dispatchers.IO) {
+        apiService.getMyFavorites()
             .mapNotNull { it.toDomainOrNull() }
     }
 
@@ -84,29 +84,28 @@ class FoodRepository(private val apiService: ApiService) {
         response.token to response.user.toDomain()
     }
 
-    suspend fun me(token: String): AppUser = withContext(Dispatchers.IO) {
-        apiService.me("Bearer $token").toDomain()
+    suspend fun me(): AppUser = withContext(Dispatchers.IO) {
+        apiService.me().toDomain()
     }
 
-    suspend fun getNutritionSummary(token: String): NutritionSummaryDto = withContext(Dispatchers.IO) {
-        apiService.getNutritionSummary("Bearer $token")
+    suspend fun getNutritionSummary(): NutritionSummaryDto = withContext(Dispatchers.IO) {
+        apiService.getNutritionSummary()
     }
 
-    suspend fun logout(token: String) = withContext(Dispatchers.IO) {
-        apiService.logout("Bearer $token")
+    suspend fun logout() = withContext(Dispatchers.IO) {
+        apiService.logout()
     }
 
-    suspend fun getMyPurchases(token: String): List<Order> = withContext(Dispatchers.IO) {
-        apiService.getMyPurchases("Bearer $token").map { it.toOrder() }
+    suspend fun getMyPurchases(): List<Order> = withContext(Dispatchers.IO) {
+        apiService.getMyPurchases().map { it.toOrder() }
     }
 
-    suspend fun getMyPurchaseDetails(token: String): List<PurchaseDto> = withContext(Dispatchers.IO) {
-        apiService.getMyPurchases("Bearer $token")
+    suspend fun getMyPurchaseDetails(): List<PurchaseDto> = withContext(Dispatchers.IO) {
+        apiService.getMyPurchases()
     }
 
-    suspend fun ratePurchase(token: String, purchaseId: Int, rating: Int): Order = withContext(Dispatchers.IO) {
+    suspend fun ratePurchase(purchaseId: Int, rating: Int): Order = withContext(Dispatchers.IO) {
         apiService.updatePurchaseRating(
-            authorization = "Bearer $token",
             purchaseId = purchaseId,
             request = PurchaseRatingUpdateDto(calificacion = rating)
         ).toOrder()

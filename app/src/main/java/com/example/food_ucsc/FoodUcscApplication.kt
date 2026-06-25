@@ -2,8 +2,9 @@ package com.example.food_ucsc
 
 import android.app.Application
 import com.example.food_ucsc.data.local.SessionManager
-import com.example.food_ucsc.data.remote.RetrofitClient
 import com.example.food_ucsc.data.repository.FoodRepository
+import com.example.food_ucsc.di.NetworkModule
+import com.example.food_ucsc.di.RepositoryModule
 
 class FoodUcscApplication : Application() {
     lateinit var container: AppContainer
@@ -20,11 +21,19 @@ interface AppContainer {
 }
 
 class AppDataContainer(private val application: Application) : AppContainer {
-    override val foodRepository: FoodRepository by lazy {
-        FoodRepository(RetrofitClient.apiService)
+    override val sessionManager: SessionManager by lazy {
+        RepositoryModule.provideSessionManager(application)
     }
 
-    override val sessionManager: SessionManager by lazy {
-        SessionManager(application.applicationContext)
+    override val foodRepository: FoodRepository by lazy {
+        RepositoryModule.provideFoodRepository(
+            NetworkModule.provideApiService(
+                NetworkModule.provideRetrofit(
+                    NetworkModule.provideOkHttpClient(
+                        NetworkModule.provideAuthInterceptor(sessionManager)
+                    )
+                )
+            )
+        )
     }
 }

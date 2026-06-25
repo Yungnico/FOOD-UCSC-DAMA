@@ -31,20 +31,17 @@ object AppViewModelProvider {
         }
         initializer {
             OrderHistoryViewModel(
-                foodUcscApplication().container.foodRepository,
-                foodUcscApplication().container.sessionManager
+                foodUcscApplication().container.foodRepository
             )
         }
         initializer {
             NutritionalInfoViewModel(
-                foodUcscApplication().container.foodRepository,
-                foodUcscApplication().container.sessionManager
+                foodUcscApplication().container.foodRepository
             )
         }
         initializer {
             RatingViewModel(
-                foodUcscApplication().container.foodRepository,
-                foodUcscApplication().container.sessionManager
+                foodUcscApplication().container.foodRepository
             )
         }
         initializer {

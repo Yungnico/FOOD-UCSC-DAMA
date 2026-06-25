@@ -2,7 +2,6 @@ package com.example.food_ucsc.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.food_ucsc.data.local.SessionManager
 import com.example.food_ucsc.data.repository.FoodRepository
 import com.example.food_ucsc.ui.models.Order
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +17,7 @@ data class OrderHistoryUiState(
 )
 
 class OrderHistoryViewModel(
-    private val repository: FoodRepository,
-    private val sessionManager: SessionManager
+    private val repository: FoodRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OrderHistoryUiState())
@@ -30,22 +28,10 @@ class OrderHistoryViewModel(
     }
 
     fun loadOrders() {
-        val token = sessionManager.getToken()
-        if (token.isNullOrBlank()) {
-            _uiState.update {
-                it.copy(
-                    orders = emptyList(),
-                    isLoading = false,
-                    error = "No hay una sesión activa"
-                )
-            }
-            return
-        }
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
-                repository.getMyPurchases(token)
+                repository.getMyPurchases()
             }.onSuccess { orders ->
                 _uiState.update {
                     it.copy(orders = orders, isLoading = false, error = null)
