@@ -108,18 +108,45 @@ class HomeViewModel(
         _uiState.update { it.copy(showRatingDialog = false) }
     }
 
+    fun toggleFilterSheet(show: Boolean) {
+        _uiState.update { it.copy(showFilterSheet = show) }
+    }
+
+    fun onFilterSelected(filter: String) {
+        _uiState.update { state ->
+            val newState = state.copy(selectedNutritionalFilter = filter, showFilterSheet = false)
+            applyFiltersToState(newState)
+        }
+    }
+
     fun onSearchQueryChange(query: String) {
         _uiState.update { state ->
-            val filteredResults = if (query.isBlank()) {
-                emptyList()
-            } else {
-                allProducts.filter { 
-                    it.nombre.contains(query, ignoreCase = true) || 
-                    it.descripcion.contains(query, ignoreCase = true) ||
-                    it.categoria_basica.contains(query, ignoreCase = true)
-                }
-            }
-            state.copy(searchQuery = query, searchResults = filteredResults)
+            val newState = state.copy(searchQuery = query)
+            applyFiltersToState(newState)
         }
+    }
+
+    private fun applyFiltersToState(state: HomeUiState): HomeUiState {
+        val query = state.searchQuery
+        val filter = state.selectedNutritionalFilter
+
+        if (query.isBlank() && filter == "Todos") {
+            return state.copy(searchResults = emptyList())
+        }
+
+        val results = allProducts.filter { item ->
+            val matchesQuery = query.isBlank() || 
+                item.nombre.contains(query, ignoreCase = true) || 
+                item.descripcion.contains(query, ignoreCase = true)
+
+            val matchesFilter = when (filter) {
+                "Bajo en calorías" -> item.calories in 1..400 || item.descripcion.lowercase().contains("bajo en cal")
+                "Proteico" -> item.descripcion.lowercase().contains("prote") || item.nombre.lowercase().contains("prote")
+                "Saludable" -> item.categoria_basica.equals("Saludable", ignoreCase = true)
+                else -> true
+            }
+            matchesQuery && matchesFilter
+        }
+        return state.copy(searchResults = results)
     }
 }

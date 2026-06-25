@@ -14,6 +14,8 @@ data class HomeUiState(
     val searchResults: List<FoodItem> = emptyList(),
     val isLoading: Boolean = false,
     val searchQuery: String = "",
+    val selectedNutritionalFilter: String = "Todos", // "Todos", "Bajo en calorías", "Proteico", "Saludable"
     val showRatingDialog: Boolean = false,
-    val pendingOrderId: String? = null
+    val pendingOrderId: String? = null,
+    val showFilterSheet: Boolean = false
 )

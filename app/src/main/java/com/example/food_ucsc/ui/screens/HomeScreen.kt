@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,13 +37,17 @@ import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.models.HealthTip
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
 
     if (uiState.showRatingDialog && uiState.pendingOrderId != null) {
         AlertDialog(
@@ -68,6 +73,20 @@ fun HomeScreen(
         )
     }
 
+    // Modal para los filtros nutricionales
+    if (uiState.showFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.toggleFilterSheet(false) },
+            sheetState = sheetState,
+            containerColor = Color.White
+        ) {
+            NutritionalFilterContent(
+                selectedFilter = uiState.selectedNutritionalFilter,
+                onFilterSelected = { viewModel.onFilterSelected(it) }
+            )
+        }
+    }
+
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
         containerColor = Color(0xFFFBF8FF)
@@ -79,17 +98,35 @@ fun HomeScreen(
         ) {
             Header(
                 query = uiState.searchQuery,
-                onQueryChange = { viewModel.onSearchQueryChange(it) }
+                onQueryChange = { viewModel.onSearchQueryChange(it) },
+                onFilterClick = { viewModel.toggleFilterSheet(true) },
+                hasActiveFilter = uiState.selectedNutritionalFilter != "Todos"
             )
 
-            if (uiState.searchQuery.isNotEmpty()) {
-                // Resultados de búsqueda
-                Text(
-                    text = "Resultados para \"${uiState.searchQuery}\"",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp),
-                    fontWeight = FontWeight.Bold
-                )
+            // Si hay búsqueda o un filtro activo, mostramos los resultados
+            if (uiState.searchQuery.isNotEmpty() || uiState.selectedNutritionalFilter != "Todos") {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (uiState.searchQuery.isNotEmpty()) 
+                            "Resultados para \"${uiState.searchQuery}\"" 
+                            else "Filtrado por: ${uiState.selectedNutritionalFilter}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    // Mostrar chip del filtro activo para poder quitarlo
+                    if (uiState.selectedNutritionalFilter != "Todos") {
+                        AssistChip(
+                            onClick = { viewModel.onFilterSelected("Todos") },
+                            label = { Text(uiState.selectedNutritionalFilter) },
+                            trailingIcon = { Icon(Icons.Default.Close, null, Modifier.size(16.dp)) },
+                            colors = AssistChipDefaults.assistChipColors(labelColor = Color(0xFF6750A4))
+                        )
+                    }
+                }
                 
                 if (uiState.searchResults.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -113,7 +150,7 @@ fun HomeScreen(
                     }
                 }
             } else {
-                // Contenido normal del Home
+                // Contenido normal del Home cuando no hay búsqueda ni filtros
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -141,7 +178,12 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header(query: String, onQueryChange: (String) -> Unit) {
+fun Header(
+    query: String, 
+    onQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit,
+    hasActiveFilter: Boolean
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,9 +220,19 @@ fun Header(query: String, onQueryChange: (String) -> Unit) {
                 Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray)
             },
             trailingIcon = {
-                if (query.isNotEmpty()) {
-                    IconButton(onClick = { onQueryChange("") }) {
-                        Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = Color.Gray)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { onQueryChange("") }) {
+                            Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = Color.Gray)
+                        }
+                    }
+                    // Botón de filtro (símbolo de líneas)
+                    IconButton(onClick = onFilterClick) {
+                        Icon(
+                            imageVector = Icons.Default.Tune, 
+                            contentDescription = "Filtros Nutricionales",
+                            tint = if (hasActiveFilter) Color(0xFF6750A4) else Color.Gray
+                        )
                     }
                 }
             },
@@ -194,6 +246,50 @@ fun Header(query: String, onQueryChange: (String) -> Unit) {
             ),
             singleLine = true
         )
+    }
+}
+
+@Composable
+fun NutritionalFilterContent(
+    selectedFilter: String,
+    onFilterSelected: (String) -> Unit
+) {
+    val filters = listOf("Todos", "Bajo en calorías", "Proteico", "Saludable")
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .padding(bottom = 32.dp)
+    ) {
+        Text(
+            text = "Filtros Nutricionales",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        filters.forEach { filter ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onFilterSelected(filter) }
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = filter,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (selectedFilter == filter) Color(0xFF6750A4) else Color.Black,
+                    fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Normal
+                )
+                if (selectedFilter == filter) {
+                    Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF6750A4))
+                }
+            }
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+        }
     }
 }
 
