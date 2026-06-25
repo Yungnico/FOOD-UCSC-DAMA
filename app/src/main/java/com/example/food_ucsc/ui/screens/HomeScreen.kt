@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.components.BottomNavBar
+import com.example.food_ucsc.ui.components.FoodItemCard
 import com.example.food_ucsc.ui.models.Category
 import com.example.food_ucsc.ui.models.Challenge
 import com.example.food_ucsc.ui.models.FoodItem
@@ -75,29 +76,72 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
         ) {
-            Header()
-            Spacer(modifier = Modifier.height(24.dp))
-            CategorySection(
-                categories = uiState.categories,
-                navController = navController
+            Header(
+                query = uiState.searchQuery,
+                onQueryChange = { viewModel.onSearchQueryChange(it) }
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            RecommendedSection(recommendedItems = uiState.recommendedItems)
-            Spacer(modifier = Modifier.height(24.dp))
-            FavouriteSection(favoriteItems = uiState.favoriteItems)
-            Spacer(modifier = Modifier.height(24.dp))
-            TipsSection(tips = uiState.tips)
-            Spacer(modifier = Modifier.height(24.dp))
-            ChallengesSection(challenges = uiState.challenges)
-            Spacer(modifier = Modifier.height(24.dp))
+
+            if (uiState.searchQuery.isNotEmpty()) {
+                // Resultados de búsqueda
+                Text(
+                    text = "Resultados para \"${uiState.searchQuery}\"",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                    fontWeight = FontWeight.Bold
+                )
+                
+                if (uiState.searchResults.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No se encontraron productos", color = Color.Gray)
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        uiState.searchResults.forEach { item ->
+                            FoodItemCard(
+                                item = item,
+                                onClick = { /* Detalle del producto */ }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+                }
+            } else {
+                // Contenido normal del Home
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    CategorySection(
+                        categories = uiState.categories,
+                        navController = navController
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    RecommendedSection(recommendedItems = uiState.recommendedItems)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    FavouriteSection(favoriteItems = uiState.favoriteItems)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TipsSection(tips = uiState.tips)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    ChallengesSection(challenges = uiState.challenges)
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header() {
+fun Header(query: String, onQueryChange: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,38 +165,35 @@ fun Header() {
         
         Spacer(modifier = Modifier.width(12.dp))
         
-        Surface(
+        TextField(
+            value = query,
+            onValueChange = onQueryChange,
             modifier = Modifier
                 .weight(1f)
                 .height(56.dp),
+            placeholder = { 
+                Text(stringResource(R.string.search), color = Color.Gray, fontSize = 14.sp) 
+            },
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray)
+            },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = Color.Gray)
+                    }
+                }
+            },
             shape = RoundedCornerShape(28.dp),
-            color = Color(0xFFF3F0F8)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.start_here),
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Icon(
-                    imageVector = Icons.Default.RestaurantMenu,
-                    contentDescription = stringResource(R.string.menu),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.search),
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFFF3F0F8),
+                unfocusedContainerColor = Color(0xFFF3F0F8),
+                disabledContainerColor = Color(0xFFF3F0F8),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+            singleLine = true
+        )
     }
 }
 
@@ -190,7 +231,6 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
                             }
                         )
                     }
-                    // Si la fila no está completa (menos de 3), rellenamos con Espaciadores con peso
                     if (rowCategories.size < 3) {
                         repeat(3 - rowCategories.size) {
                             Spacer(modifier = Modifier.weight(1f))
@@ -307,6 +347,8 @@ fun ProductCard(name: String, icon: ImageVector) {
 
 @Composable
 fun FavouriteSection(favoriteItems: List<FoodItem>) {
+    if (favoriteItems.isEmpty()) return
+    
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = stringResource(R.string.favorite),
@@ -347,6 +389,8 @@ fun FavouriteCard(icon: ImageVector) {
 
 @Composable
 fun TipsSection(tips: List<HealthTip>) {
+    if (tips.isEmpty()) return
+    
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "Consejos rápidos",
@@ -382,6 +426,8 @@ fun TipsSection(tips: List<HealthTip>) {
 
 @Composable
 fun ChallengesSection(challenges: List<Challenge>) {
+    if (challenges.isEmpty()) return
+
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "Desafíos saludables",

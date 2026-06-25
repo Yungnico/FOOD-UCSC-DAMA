@@ -24,15 +24,14 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var allProducts: List<FoodItem> = emptyList()
+
     init {
         loadHomeData()
         checkPendingRatings()
     }
 
     private fun loadHomeData() {
-        // Evitar recargar si ya tenemos datos cargados
-        if (_uiState.value.categories.isNotEmpty()) return
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -43,7 +42,9 @@ class HomeViewModel(
                         .getOrDefault(emptyList())
                 }
 
-                // Llamada a la API a través del repositorio para obtener las categorías
+                // Cargamos todos los productos para la búsqueda
+                allProducts = foodRepository.getProducts()
+
                 val categories = runCatching { foodRepository.getCategories() }
                     .getOrDefault(emptyList())
 
@@ -108,6 +109,17 @@ class HomeViewModel(
     }
 
     fun onSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
+        _uiState.update { state ->
+            val filteredResults = if (query.isBlank()) {
+                emptyList()
+            } else {
+                allProducts.filter { 
+                    it.nombre.contains(query, ignoreCase = true) || 
+                    it.descripcion.contains(query, ignoreCase = true) ||
+                    it.categoria_basica.contains(query, ignoreCase = true)
+                }
+            }
+            state.copy(searchQuery = query, searchResults = filteredResults)
+        }
     }
 }

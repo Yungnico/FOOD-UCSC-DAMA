@@ -11,6 +11,7 @@ data class HomeUiState(
     val favoriteItems: List<FoodItem> = emptyList(),
     val tips: List<HealthTip> = emptyList(),
     val challenges: List<Challenge> = emptyList(),
+    val searchResults: List<FoodItem> = emptyList(),
     val isLoading: Boolean = false,
     val searchQuery: String = "",
     val showRatingDialog: Boolean = false,
