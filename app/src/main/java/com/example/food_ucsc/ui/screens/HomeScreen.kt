@@ -616,24 +616,22 @@ fun FavouriteSection(
 ) {
     if (favoriteItems.isEmpty()) return
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Text(text = stringResource(R.string.favorite), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.favorite),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             favoriteItems.forEach { item ->
-                Box(modifier = Modifier.size(100.dp)) {
-                    Card(
-                        modifier = Modifier.fillMaxSize().border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(16.dp)),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Icon(imageVector = item.icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.Gray)
-                        }
-                    }
-                    IconButton(onClick = { onFavoriteToggle(item.id) }, modifier = Modifier.align(Alignment.TopEnd).size(32.dp)) {
-                        Icon(Icons.Default.Star, contentDescription = stringResource(R.string.favorite_desc), tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
-                    }
-                }
+                ProductCard(
+                    item = item,
+                    isFavorite = true,
+                    onFavoriteClick = { onFavoriteToggle(item.id) }
+                )
             }
         }
     }
