@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,12 @@ import com.example.food_ucsc.navigation.Screen
 fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    // Explore está activo si estamos en la lista, en el detalle de un local o en categorías
+    val isExploreActive = currentRoute == Screen.Explore.route || 
+                         currentRoute?.startsWith("restaurant") == true ||
+                         currentRoute == Screen.AllCategories.route ||
+                         currentRoute?.startsWith("category") == true
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -62,10 +69,25 @@ fun BottomNavBar(navController: NavController) {
             NavItem(
                 label = stringResource(R.string.nav_explore),
                 icon = Icons.Default.Explore,
-                isActive = currentRoute == Screen.Explore.route
+                isActive = isExploreActive
             ) {
                 if (currentRoute != Screen.Explore.route) {
                     navController.navigate(Screen.Explore.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
+            NavItem(
+                label = "Map",
+                icon = Icons.Default.LocationOn,
+                isActive = currentRoute == Screen.Map.route
+            ) {
+                if (currentRoute != Screen.Map.route) {
+                    navController.navigate(Screen.Map.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }

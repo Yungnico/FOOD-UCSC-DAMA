@@ -14,15 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.food_ucsc.navigation.Screen
-import com.example.food_ucsc.ui.screens.AllCategoriesScreen
-import com.example.food_ucsc.ui.screens.CategoryScreen
-import com.example.food_ucsc.ui.screens.ExploreScreen
-import com.example.food_ucsc.ui.screens.HomeScreen
-import com.example.food_ucsc.ui.screens.LoginScreen
-import com.example.food_ucsc.ui.screens.NutritionalInfoScreen
-import com.example.food_ucsc.ui.screens.ProfileScreen
-import com.example.food_ucsc.ui.screens.RegisterScreen
-import com.example.food_ucsc.ui.screens.RestaurantDetailScreen
 import com.example.food_ucsc.ui.screens.*
 import com.example.food_ucsc.ui.theme.FoodUCSC_Theme
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
@@ -55,12 +46,14 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) {
                         HomeScreen(navController = navController)
                     }
-
                     composable(Screen.Explore.route) {
                         ExploreScreen(navController = navController)
                     }
+                    // AGREGADO: Ruta para la pantalla del Mapa
+                    composable(Screen.Map.route) {
+                        MapScreen(navController = navController)
+                    }
                     composable(Screen.AllCategories.route) { backStackEntry ->
-                        // Compartimos el ViewModel de la pantalla Home para no recargar datos
                         val parentEntry = remember(backStackEntry) {
                             navController.getBackStackEntry(Screen.Home.route)
                         }
