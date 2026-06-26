@@ -6,10 +6,10 @@ import com.example.food_ucsc.data.remote.service.ApiService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object NetworkModule {
 
-    // Reemplazar -> http://10.0.2.2:8000/api/ por http://IPV4_DE_TU_PC:8000/api/
     private const val BASE_URL = "http://10.0.2.2:8000/api/"
 
     fun provideAuthInterceptor(sessionManager: SessionManager): AuthInterceptor {
@@ -19,6 +19,9 @@ object NetworkModule {
     fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

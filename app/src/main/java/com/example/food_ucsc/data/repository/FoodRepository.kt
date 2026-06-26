@@ -1,45 +1,29 @@
 package com.example.food_ucsc.data.repository
 
-import com.example.food_ucsc.data.remote.dto.LoginRequestDto
-import com.example.food_ucsc.data.remote.dto.NutritionSummaryDto
-import com.example.food_ucsc.data.remote.dto.ProductDetailDto
-import com.example.food_ucsc.data.remote.dto.PurchaseRegistrationRequestDto
-import com.example.food_ucsc.data.remote.dto.PurchaseRatingUpdateDto
-import com.example.food_ucsc.data.remote.dto.PurchaseDto
-import com.example.food_ucsc.data.remote.dto.RegisterRequestDto
-import com.example.food_ucsc.data.remote.toDomain as toCategoryDomain
+import android.util.Log
+import com.example.food_ucsc.data.remote.*
+import com.example.food_ucsc.data.remote.dto.*
 import com.example.food_ucsc.data.remote.service.ApiService
-import com.example.food_ucsc.data.remote.toDomain
-import com.example.food_ucsc.data.remote.toOrder
-import com.example.food_ucsc.data.remote.toFoodItem
-import com.example.food_ucsc.data.remote.toDomainOrNull
-import com.example.food_ucsc.ui.models.AppUser
-import com.example.food_ucsc.ui.models.Category
-import com.example.food_ucsc.ui.models.Challenge
-import com.example.food_ucsc.ui.models.HealthTip
-import com.example.food_ucsc.ui.models.Menu
-import com.example.food_ucsc.ui.models.FoodItem
-import com.example.food_ucsc.ui.models.Order
-import com.example.food_ucsc.ui.models.Restaurant
+import com.example.food_ucsc.ui.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class FoodRepository(private val apiService: ApiService) {
 
     suspend fun getRestaurants(): List<Restaurant> = withContext(Dispatchers.IO) {
-        apiService.getRestaurants().map { it.toDomain() }
+        runCatching { apiService.getRestaurants().map { it.toDomain() } }.getOrDefault(emptyList())
     }
 
     suspend fun getCategories(): List<Category> = withContext(Dispatchers.IO) {
-        apiService.getCategories().map { it.toCategoryDomain() }
+        runCatching { apiService.getCategories().map { it.toDomain() } }.getOrDefault(emptyList())
     }
 
     suspend fun getProducts(): List<FoodItem> = withContext(Dispatchers.IO) {
-        apiService.getProducts().map { it.toFoodItem() }
+        runCatching { apiService.getProducts().map { it.toFoodItem() } }.getOrDefault(emptyList())
     }
 
     suspend fun getProductDetails(): List<ProductDetailDto> = withContext(Dispatchers.IO) {
-        apiService.getProducts()
+        runCatching { apiService.getProducts() }.getOrDefault(emptyList())
     }
 
     suspend fun getRestaurantById(id: Int): Restaurant = withContext(Dispatchers.IO) {
@@ -47,17 +31,32 @@ class FoodRepository(private val apiService: ApiService) {
     }
 
     suspend fun getMenusByRestaurant(restaurantId: Int): List<Menu> = withContext(Dispatchers.IO) {
-        apiService.getMenusByRestaurant(restaurantId).map { it.toDomain() }
+        runCatching { apiService.getMenusByRestaurant(restaurantId).map { it.toDomain() } }.getOrDefault(emptyList())
     }
 
-    suspend fun getFavoritesByUser(userId: Int) = withContext(Dispatchers.IO) {
-        apiService.getFavoritesByUser(userId)
-            .mapNotNull { it.toDomainOrNull() }
+    suspend fun getMyFavorites(): List<FoodItem> = withContext(Dispatchers.IO) {
+        try {
+            apiService.getMyFavorites().mapNotNull { it.toDomainOrNull() }
+        } catch (e: Exception) {
+            Log.e("Repository", "Favoritos no disponibles: ${e.message}")
+            emptyList()
+        }
     }
 
-    suspend fun getMyFavorites() = withContext(Dispatchers.IO) {
-        apiService.getMyFavorites()
-            .mapNotNull { it.toDomainOrNull() }
+    suspend fun getMyFavoritesRaw(): List<FavoriteDto> = withContext(Dispatchers.IO) {
+        try {
+            apiService.getMyFavorites()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun addFavorite(productId: Int): FavoriteDto = withContext(Dispatchers.IO) {
+        apiService.addFavorite(mapOf("producto_id" to productId))
+    }
+
+    suspend fun deleteFavorite(favoriteId: Int) = withContext(Dispatchers.IO) {
+        apiService.deleteFavorite(favoriteId)
     }
 
     suspend fun login(email: String, password: String): Pair<String, AppUser> = withContext(Dispatchers.IO) {
@@ -65,57 +64,22 @@ class FoodRepository(private val apiService: ApiService) {
         response.token to response.user.toDomain()
     }
 
-    suspend fun register(
-        nombre: String,
-        apellidoPaterno: String,
-        apellidoMaterno: String,
-        email: String,
-        password: String
-    ): Pair<String, AppUser> = withContext(Dispatchers.IO) {
-        val response = apiService.register(
-            RegisterRequestDto(
-                nombre = nombre,
-                apellidoPaterno = apellidoPaterno.ifBlank { null },
-                apellidoMaterno = apellidoMaterno.ifBlank { null },
-                email = email,
-                password = password
-            )
-        )
+    suspend fun register(nombre: String, apP: String, apM: String, email: String, pass: String): Pair<String, AppUser> = withContext(Dispatchers.IO) {
+        val response = apiService.register(RegisterRequestDto(nombre, apP.ifBlank { null }, apM.ifBlank { null }, email, pass))
         response.token to response.user.toDomain()
     }
 
-    suspend fun me(): AppUser = withContext(Dispatchers.IO) {
-        apiService.me().toDomain()
-    }
+    suspend fun me(): AppUser = withContext(Dispatchers.IO) { apiService.me().toDomain() }
+    suspend fun logout() = withContext(Dispatchers.IO) { apiService.logout() }
+    suspend fun getMyPurchases(): List<Order> = withContext(Dispatchers.IO) { apiService.getMyPurchases().map { it.toOrder() } }
+    suspend fun getTips(): List<HealthTip> = withContext(Dispatchers.IO) { apiService.getTips().map { it.toDomain() } }
+    suspend fun getChallenges(): List<Challenge> = withContext(Dispatchers.IO) { apiService.getChallenges().map { it.toDomain() } }
 
     suspend fun getNutritionSummary(): NutritionSummaryDto = withContext(Dispatchers.IO) {
         apiService.getNutritionSummary()
     }
 
-    suspend fun logout() = withContext(Dispatchers.IO) {
-        apiService.logout()
-    }
-
-    suspend fun getMyPurchases(): List<Order> = withContext(Dispatchers.IO) {
-        apiService.getMyPurchases().map { it.toOrder() }
-    }
-
-    suspend fun getMyPurchaseDetails(): List<PurchaseDto> = withContext(Dispatchers.IO) {
-        apiService.getMyPurchases()
-    }
-
-    suspend fun ratePurchase(purchaseId: Int, rating: Int): Order = withContext(Dispatchers.IO) {
-        apiService.updatePurchaseRating(
-            purchaseId = purchaseId,
-            request = PurchaseRatingUpdateDto(calificacion = rating)
-        ).toOrder()
-    }
-
-    suspend fun getTips(): List<HealthTip> = withContext(Dispatchers.IO) {
-        apiService.getTips().map { it.toDomain() }
-    }
-
-    suspend fun getChallenges(): List<Challenge> = withContext(Dispatchers.IO) {
-        apiService.getChallenges().map { it.toDomain() }
+    suspend fun ratePurchase(purchaseId: Int, rating: Int): PurchaseDto = withContext(Dispatchers.IO) {
+        apiService.updatePurchaseRating(purchaseId, PurchaseRatingUpdateDto(rating))
     }
 }

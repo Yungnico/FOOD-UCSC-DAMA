@@ -9,6 +9,8 @@ data class CategoryUiState(
     val items: List<FoodItem> = emptyList(),
     val restaurants: List<Restaurant> = emptyList(),
     val categories: List<Category> = emptyList(),
+    val favoriteProductIds: Set<Int> = emptySet(),
+    val favoriteMap: Map<Int, Int> = emptyMap(), // productId to favoriteId
     val isLoading: Boolean = false,
     val error: String? = null
 )
