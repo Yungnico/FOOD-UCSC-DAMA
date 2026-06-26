@@ -65,7 +65,7 @@ class HomeViewModel(
                     Log.d("HomeVM", "Tendencias cargadas exitosamente: ${items.size} productos")
                     if (items.isEmpty()) {
                         Log.d("HomeVM", "La lista de tendencias está vacía, usando backup de 10 productos")
-                        allProducts.take(10)
+                        allProducts.take(12)
                     } else {
                         items
                     }
