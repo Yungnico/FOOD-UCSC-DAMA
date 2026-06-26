@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object NetworkModule {
 
     // Reemplazar -> http://10.0.2.2:8000/api/ por http://IPV4_DE_TU_PC:8000/api/
-    private const val BASE_URL = "http://10.0.2.2:8000/api/"
+    private const val BASE_URL = "http://192.168.100.23:8000/api/"
 
     fun provideAuthInterceptor(sessionManager: SessionManager): AuthInterceptor {
         return AuthInterceptor(sessionManager)
