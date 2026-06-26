@@ -20,7 +20,6 @@ data class HomeUiState(
     val showRatingDialog: Boolean = false,
     val pendingOrderId: String? = null,
     val showFilterSheet: Boolean = false,
-    val showFilterSheet: Boolean = false,
     
     // Funcionalidad de recordatorio de agua
     val showWaterReminder: Boolean = false,
