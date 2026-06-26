@@ -25,6 +25,7 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private var allProducts: List<FoodItem> = emptyList()
+    private var isDataLoaded = false // Bandera adicional para control absoluto
 
     init {
         loadHomeData()
@@ -32,6 +33,9 @@ class HomeViewModel(
     }
 
     private fun loadHomeData() {
+        // EVITAR RECARGA: Si ya cargamos exitosamente, no hacemos nada.
+        if (isDataLoaded || _uiState.value.categories.isNotEmpty()) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -42,9 +46,7 @@ class HomeViewModel(
                         .getOrDefault(emptyList())
                 }
 
-                // Cargamos todos los productos para la búsqueda
                 allProducts = foodRepository.getProducts()
-
                 val categories = runCatching { foodRepository.getCategories() }
                     .getOrDefault(emptyList())
 
@@ -79,12 +81,10 @@ class HomeViewModel(
                         isLoading = false
                     )
                 }
+                isDataLoaded = true // Marcamos como cargado solo tras el éxito
             }.onFailure {
                 _uiState.update {
                     it.copy(
-                        categories = emptyList(),
-                        recommendedItems = emptyList(),
-                        favoriteItems = emptyList(),
                         isLoading = false
                     )
                 }
