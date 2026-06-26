@@ -55,7 +55,12 @@ class HomeViewModel(
 
                 allProducts = (baseProducts + menuProducts).distinctBy { it.id }
 
-                val favoritesRaw = runCatching { foodRepository.getMyFavoritesRaw() }.getOrDefault(emptyList())
+                val userId = sessionManager.getUserId()
+                val favoritesRaw = if (userId != null) {
+                    runCatching { foodRepository.getFavoritesByUser(userId) }.getOrDefault(emptyList())
+                } else {
+                    runCatching { foodRepository.getMyFavoritesRaw() }.getOrDefault(emptyList())
+                }
                 val favoriteProductIds = favoritesRaw.map { it.productoId }.toSet()
                 val favoriteMap = favoritesRaw.associate { it.productoId to it.id }
                 val favoriteItems = allProducts.filter { it.id in favoriteProductIds }
@@ -119,10 +124,36 @@ class HomeViewModel(
                             favoriteMap = state.favoriteMap - productId
                         )
                     }
-                    if (favoriteId != null) {
-                        foodRepository.deleteFavorite(favoriteId)
+                    val resolvedFavoriteId = favoriteId ?: run {
+                        val userId = sessionManager.getUserId()
+                        val serverFavorite = userId?.let { user ->
+                            foodRepository.getFavoritesByUser(user).firstOrNull { it.productoId == productId }
+                        }
+                        serverFavorite?.id
+                    }
+                    if (resolvedFavoriteId != null) {
+                        foodRepository.deleteFavorite(resolvedFavoriteId)
                     }
                 } else {
+                    val userId = sessionManager.getUserId()
+                    if (userId == null) {
+                        throw IllegalStateException("No hay usuario autenticado")
+                    }
+
+                    val serverFavorite = foodRepository.getFavoritesByUser(userId).firstOrNull { it.productoId == productId }
+                    if (serverFavorite != null) {
+                        _uiState.update { state ->
+                            state.copy(
+                                favoriteProductIds = state.favoriteProductIds + productId,
+                                favoriteItems = state.favoriteItems.ifEmpty {
+                                    allProducts.filter { it.id == productId }
+                                },
+                                favoriteMap = state.favoriteMap + (productId to serverFavorite.id)
+                            )
+                        }
+                        return@launch
+                    }
+
                     val productToAdd = allProducts.find { it.id == productId }
                     _uiState.update { state ->
                         state.copy(
@@ -130,7 +161,7 @@ class HomeViewModel(
                             favoriteItems = if (productToAdd != null) state.favoriteItems + productToAdd else state.favoriteItems
                         )
                     }
-                    val newFavorite = foodRepository.addFavorite(productId)
+                    val newFavorite = foodRepository.addFavorite(userId, productId)
                     _uiState.update { state ->
                         state.copy(favoriteMap = state.favoriteMap + (productId to newFavorite.id))
                     }

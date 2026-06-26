@@ -51,8 +51,16 @@ class FoodRepository(private val apiService: ApiService) {
         }
     }
 
-    suspend fun addFavorite(productId: Int): FavoriteDto = withContext(Dispatchers.IO) {
-        apiService.addFavorite(mapOf("producto_id" to productId))
+    suspend fun getFavoritesByUser(userId: Int): List<FavoriteDto> = withContext(Dispatchers.IO) {
+        try {
+            apiService.getFavoritesByUser(userId)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun addFavorite(userId: Int, productId: Int): FavoriteDto = withContext(Dispatchers.IO) {
+        apiService.addFavorite(mapOf("usuario_id" to userId, "producto_id" to productId))
     }
 
     suspend fun deleteFavorite(favoriteId: Int) = withContext(Dispatchers.IO) {

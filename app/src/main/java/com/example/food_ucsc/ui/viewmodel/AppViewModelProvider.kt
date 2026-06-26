@@ -16,12 +16,14 @@ object AppViewModelProvider {
         }
         initializer {
             RestaurantViewModel(
-                foodUcscApplication().container.foodRepository
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
             )
         }
         initializer {
             CategoryViewModel(
-                foodUcscApplication().container.foodRepository
+                foodUcscApplication().container.foodRepository,
+                foodUcscApplication().container.sessionManager
             )
         }
         initializer {

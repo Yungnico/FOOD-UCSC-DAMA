@@ -3,6 +3,7 @@ package com.example.food_ucsc.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.food_ucsc.data.local.SessionManager
 import com.example.food_ucsc.data.repository.FoodRepository
 import com.example.food_ucsc.ui.state.RestaurantDetailUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RestaurantViewModel(private val foodRepository: FoodRepository) : ViewModel() {
+class RestaurantViewModel(
+    private val foodRepository: FoodRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RestaurantDetailUiState())
     val uiState: StateFlow<RestaurantDetailUiState> = _uiState.asStateFlow()
 
@@ -65,7 +69,11 @@ class RestaurantViewModel(private val foodRepository: FoodRepository) : ViewMode
                         }
                     }
                 } else {
-                    val newFav = foodRepository.addFavorite(productId)
+                    val userId = sessionManager.getUserId()
+                    if (userId == null) {
+                        throw IllegalStateException("No hay usuario autenticado")
+                    }
+                    val newFav = foodRepository.addFavorite(userId, productId)
                     _uiState.update { state ->
                         state.copy(
                             favoriteProductIds = state.favoriteProductIds + productId,
