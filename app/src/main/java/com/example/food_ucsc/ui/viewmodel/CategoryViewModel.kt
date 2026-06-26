@@ -1,5 +1,6 @@
 package com.example.food_ucsc.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,15 @@ class CategoryViewModel(private val foodRepository: FoodRepository) : ViewModel(
                 val restaurants = foodRepository.getRestaurants()
                 val categories = foodRepository.getCategories()
                 val products = foodRepository.getProductDetails()
+                
+                // Cargar favoritos
+                val favorites = try {
+                    foodRepository.getMyFavoritesRaw()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                val favIds = favorites.map { it.productoId }.toSet()
+                val favMap = favorites.associate { it.productoId to it.id }
 
                 if (categoryName == "Otros") {
                     _uiState.update {
@@ -40,6 +50,8 @@ class CategoryViewModel(private val foodRepository: FoodRepository) : ViewModel(
                                     Category("Otros", Icons.Default.MoreHoriz)
                                 )
                             },
+                            favoriteProductIds = favIds,
+                            favoriteMap = favMap,
                             isLoading = false
                         )
                     }
@@ -62,6 +74,8 @@ class CategoryViewModel(private val foodRepository: FoodRepository) : ViewModel(
                     it.copy(
                         restaurants = matchedRestaurants,
                         items = matchingProducts.map { it.toFoodItem() },
+                        favoriteProductIds = favIds,
+                        favoriteMap = favMap,
                         isLoading = false
                     )
                 }
@@ -72,6 +86,36 @@ class CategoryViewModel(private val foodRepository: FoodRepository) : ViewModel(
                         isLoading = false
                     )
                 }
+            }
+        }
+    }
+
+    fun toggleFavorite(productId: Int) {
+        viewModelScope.launch {
+            val isFavorite = _uiState.value.favoriteProductIds.contains(productId)
+            try {
+                if (isFavorite) {
+                    val favoriteId = _uiState.value.favoriteMap[productId]
+                    if (favoriteId != null) {
+                        foodRepository.deleteFavorite(favoriteId)
+                        _uiState.update { state ->
+                            state.copy(
+                                favoriteProductIds = state.favoriteProductIds - productId,
+                                favoriteMap = state.favoriteMap - productId
+                            )
+                        }
+                    }
+                } else {
+                    val newFav = foodRepository.addFavorite(productId)
+                    _uiState.update { state ->
+                        state.copy(
+                            favoriteProductIds = state.favoriteProductIds + productId,
+                            favoriteMap = state.favoriteMap + (productId to newFav.id)
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("CategoryVM", "Error toggle: ${e.message}")
             }
         }
     }

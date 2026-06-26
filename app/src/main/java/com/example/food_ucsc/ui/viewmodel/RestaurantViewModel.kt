@@ -1,7 +1,6 @@
 package com.example.food_ucsc.ui.viewmodel
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food_ucsc.data.repository.FoodRepository
@@ -17,28 +16,65 @@ class RestaurantViewModel(private val foodRepository: FoodRepository) : ViewMode
     val uiState: StateFlow<RestaurantDetailUiState> = _uiState.asStateFlow()
 
     fun loadRestaurantDetails(restaurantId: Int) {
+        if (restaurantId <= 0) return
+
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            
-            runCatching {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
                 val restaurant = foodRepository.getRestaurantById(restaurantId)
                 val menus = foodRepository.getMenusByRestaurant(restaurantId)
+                
+                // Cargamos los favoritos reales del usuario
+                val favorites = try {
+                    foodRepository.getMyFavoritesRaw()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+
+                val favoriteProductIds = favorites.map { it.productoId }.toSet()
+                val favoriteMap = favorites.associate { it.productoId to it.id }
 
                 _uiState.update {
                     it.copy(
                         restaurant = restaurant,
                         menus = menus,
-                        isLoading = false,
-                        error = null
+                        favoriteProductIds = favoriteProductIds,
+                        favoriteMap = favoriteMap,
+                        isLoading = false
                     )
                 }
-            }.onFailure { ex ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = ex.message ?: "No se pudo cargar el detalle del local"
-                    )
+            } catch (ex: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = ex.message) }
+            }
+        }
+    }
+
+    fun toggleFavorite(productId: Int) {
+        viewModelScope.launch {
+            val isFavorite = _uiState.value.favoriteProductIds.contains(productId)
+            try {
+                if (isFavorite) {
+                    val favoriteId = _uiState.value.favoriteMap[productId]
+                    if (favoriteId != null) {
+                        foodRepository.deleteFavorite(favoriteId)
+                        _uiState.update { state ->
+                            state.copy(
+                                favoriteProductIds = state.favoriteProductIds - productId,
+                                favoriteMap = state.favoriteMap - productId
+                            )
+                        }
+                    }
+                } else {
+                    val newFav = foodRepository.addFavorite(productId)
+                    _uiState.update { state ->
+                        state.copy(
+                            favoriteProductIds = state.favoriteProductIds + productId,
+                            favoriteMap = state.favoriteMap + (productId to newFav.id)
+                        )
+                    }
                 }
+            } catch (e: Exception) {
+                Log.e("RestaurantVM", "Error al cambiar favorito: ${e.message}")
             }
         }
     }

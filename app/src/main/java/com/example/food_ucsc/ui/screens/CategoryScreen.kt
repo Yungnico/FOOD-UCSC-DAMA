@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +29,6 @@ import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.components.FoodItemCard
 import com.example.food_ucsc.ui.components.RestaurantCard
 import com.example.food_ucsc.ui.models.Category
-import com.example.food_ucsc.ui.models.Restaurant
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.CategoryViewModel
 
@@ -71,19 +69,14 @@ fun CategoryScreen(
             }
         } else {
             if (uiState.categories.isNotEmpty()) {
-                // Si hay categorías (caso "Otros"), mostramos la cuadrícula
                 CategoryGrid(
                     categories = uiState.categories,
                     innerPadding = innerPadding,
                     onCategoryClick = { selectedCategory ->
-                        // Navegamos a la misma pantalla con la nueva categoría
-                        navController.navigate("category/${selectedCategory.name}") {
-                            // Opcional: limpiar el stack para no acumular pantallas si lo prefieres
-                        }
+                        navController.navigate(Screen.Category.createRoute(selectedCategory.name))
                     }
                 )
             } else {
-                // Si no, mostramos la lista de locales o platos
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -118,9 +111,12 @@ fun CategoryScreen(
                             )
                         }
                         items(uiState.items) { item ->
-                            FoodItemCard(item = item, onClick = {
-                                // Detalle del plato
-                            })
+                            FoodItemCard(
+                                item = item,
+                                isFavorite = uiState.favoriteProductIds.contains(item.id),
+                                onFavoriteClick = { viewModel.toggleFavorite(item.id) },
+                                onClick = { /* Detalle del plato */ }
+                            )
                         }
                     }
                 }

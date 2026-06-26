@@ -78,19 +78,22 @@ fun RestaurantDetailScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                // Banner / Header Info
                 item {
                     RestaurantHeader(uiState.restaurant!!)
                 }
 
-                // Menus and Products
                 uiState.menus.forEach { menu ->
                     item {
                         MenuHeader(menu.titulo, menu.promociones)
                     }
                     items(menu.productos) { product ->
                         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                            FoodItemCard(item = product)
+                            FoodItemCard(
+                                item = product,
+                                isFavorite = uiState.favoriteProductIds.contains(product.id),
+                                onFavoriteClick = { viewModel.toggleFavorite(product.id) },
+                                onClick = { /* Podrías navegar al detalle si existiera */ }
+                            )
                         }
                     }
                 }

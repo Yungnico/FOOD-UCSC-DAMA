@@ -1,26 +1,7 @@
 package com.example.food_ucsc.data.remote.service
 
-import com.example.food_ucsc.data.remote.dto.AuthResponseDto
-import com.example.food_ucsc.data.remote.dto.CategoryDto
-import com.example.food_ucsc.data.remote.dto.ChallengeDto
-import com.example.food_ucsc.data.remote.dto.FavoriteDto
-import com.example.food_ucsc.data.remote.dto.LoginRequestDto
-import com.example.food_ucsc.data.remote.dto.MenuDto
-import com.example.food_ucsc.data.remote.dto.RegisterRequestDto
-import com.example.food_ucsc.data.remote.dto.ProductDetailDto
-import com.example.food_ucsc.data.remote.dto.PurchaseDto
-import com.example.food_ucsc.data.remote.dto.PurchaseRegistrationRequestDto
-import com.example.food_ucsc.data.remote.dto.PurchaseRatingUpdateDto
-import com.example.food_ucsc.data.remote.dto.NutritionSummaryDto
-import com.example.food_ucsc.data.remote.dto.RestaurantDto
-import com.example.food_ucsc.data.remote.dto.SimpleMessageDto
-import com.example.food_ucsc.data.remote.dto.TipDto
-import com.example.food_ucsc.data.remote.dto.UserDto
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import com.example.food_ucsc.data.remote.dto.*
+import retrofit2.http.*
 
 interface ApiService {
     @GET("locales")
@@ -72,6 +53,12 @@ interface ApiService {
 
     @GET("favoritos/mios")
     suspend fun getMyFavorites(): List<FavoriteDto>
+
+    @POST("favoritos")
+    suspend fun addFavorite(@Body request: Map<String, Int>): FavoriteDto
+
+    @DELETE("favoritos/{id}")
+    suspend fun deleteFavorite(@Path("id") favoriteId: Int): SimpleMessageDto
 
     @GET("consejos")
     suspend fun getTips(): List<TipDto>
