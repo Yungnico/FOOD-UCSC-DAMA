@@ -11,10 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +45,14 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+    var showIntervalDialog by remember { mutableStateOf(false) }
 
+    // Comprobar pedidos pendientes al entrar
+    LaunchedEffect(Unit) {
+        viewModel.checkPendingRatings()
+    }
+
+    // Diálogo de calificación de pedido
     if (uiState.showRatingDialog && uiState.pendingOrderId != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissRatingDialog() },
@@ -68,6 +72,71 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissRatingDialog() }) {
                     Text("Más tarde")
+                }
+            }
+        )
+    }
+
+    // Diálogo de Recordatorio de Agua
+    if (uiState.showWaterReminder) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissWaterReminder() },
+            icon = { Icon(Icons.Default.WaterDrop, contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(48.dp)) },
+            title = { Text("¡Hora de hidratarse!", fontWeight = FontWeight.Bold) },
+            text = { 
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(uiState.waterReminderPhrase, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(onClick = { showIntervalDialog = true }) {
+                        Text("Cambiar frecuencia (actual: ${uiState.waterReminderIntervalMinutes} min)")
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.dismissWaterReminder() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
+                ) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+    // Diálogo para elegir el tiempo del recordatorio
+    if (showIntervalDialog) {
+        AlertDialog(
+            onDismissRequest = { showIntervalDialog = false },
+            title = { Text("Frecuencia de recordatorio") },
+            text = {
+                Column {
+                    val intervals = listOf(30, 60, 90, 120)
+                    intervals.forEach { minutes ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { 
+                                    viewModel.setWaterReminderInterval(minutes)
+                                    showIntervalDialog = false 
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = uiState.waterReminderIntervalMinutes == minutes,
+                                onClick = { 
+                                    viewModel.setWaterReminderInterval(minutes)
+                                    showIntervalDialog = false 
+                                }
+                            )
+                            Text(text = "Cada $minutes minutos", modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showIntervalDialog = false }) {
+                    Text("Cancelar")
                 }
             }
         )
@@ -103,7 +172,6 @@ fun HomeScreen(
                 hasActiveFilter = uiState.selectedNutritionalFilter != "Todos"
             )
 
-            // Si hay búsqueda o un filtro activo, mostramos los resultados
             if (uiState.searchQuery.isNotEmpty() || uiState.selectedNutritionalFilter != "Todos") {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -117,7 +185,6 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
-                    // Mostrar chip del filtro activo para poder quitarlo
                     if (uiState.selectedNutritionalFilter != "Todos") {
                         AssistChip(
                             onClick = { viewModel.onFilterSelected("Todos") },
@@ -150,12 +217,35 @@ fun HomeScreen(
                     }
                 }
             } else {
-                // Contenido normal del Home cuando no hay búsqueda ni filtros
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Banner de hidratación opcional
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clickable { showIntervalDialog = true },
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFFE3F2FD)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.WaterDrop, null, tint = Color(0xFF2196F3))
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text("Recordatorio de agua", fontWeight = FontWeight.Bold, color = Color(0xFF1976D2))
+                                Text("Configurado cada ${uiState.waterReminderIntervalMinutes} min", fontSize = 12.sp)
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(24.dp))
                     CategorySection(
                         categories = uiState.categories,
@@ -226,11 +316,10 @@ fun Header(
                             Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = Color.Gray)
                         }
                     }
-                    // Botón de filtro (símbolo de líneas)
                     IconButton(onClick = onFilterClick) {
                         Icon(
                             imageVector = Icons.Default.Tune, 
-                            contentDescription = "Filtros Nutricionales",
+                            contentDescription = "Filtros nutricionales",
                             tint = if (hasActiveFilter) Color(0xFF6750A4) else Color.Gray
                         )
                     }
@@ -263,7 +352,7 @@ fun NutritionalFilterContent(
             .padding(bottom = 32.dp)
     ) {
         Text(
-            text = "Filtros Nutricionales",
+            text = "Filtros nutricionales",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)

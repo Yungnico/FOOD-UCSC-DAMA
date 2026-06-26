@@ -10,6 +10,7 @@ import com.example.food_ucsc.ui.models.Category
 import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.models.HealthTip
 import com.example.food_ucsc.ui.state.HomeUiState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,17 +26,24 @@ class HomeViewModel(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private var allProducts: List<FoodItem> = emptyList()
-    private var isDataLoaded = false // Bandera adicional para control absoluto
+    private var waterReminderJob: Job? = null
+
+    private val waterPhrases = listOf(
+        "¡Hidrátate! Tu cuerpo te lo agradecerá.",
+        "Un vaso de agua es un paso más hacia una vida saludable.",
+        "Beber agua mejora tu concentración y energía.",
+        "No esperes a tener sed, ¡bebe agua ahora!",
+        "Mantén tu mente fresca y tu cuerpo hidratado.",
+        "El agua es el combustible de tu bienestar."
+    )
 
     init {
         loadHomeData()
         checkPendingRatings()
+        startWaterReminder()
     }
 
     private fun loadHomeData() {
-        // EVITAR RECARGA: Si ya cargamos exitosamente, no hacemos nada.
-        if (isDataLoaded || _uiState.value.categories.isNotEmpty()) return
-
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -47,6 +55,7 @@ class HomeViewModel(
                 }
 
                 allProducts = foodRepository.getProducts()
+
                 val categories = runCatching { foodRepository.getCategories() }
                     .getOrDefault(emptyList())
 
@@ -81,10 +90,12 @@ class HomeViewModel(
                         isLoading = false
                     )
                 }
-                isDataLoaded = true // Marcamos como cargado solo tras el éxito
             }.onFailure {
                 _uiState.update {
                     it.copy(
+                        categories = emptyList(),
+                        recommendedItems = emptyList(),
+                        favoriteItems = emptyList(),
                         isLoading = false
                     )
                 }
@@ -92,16 +103,47 @@ class HomeViewModel(
         }
     }
 
-    private fun checkPendingRatings() {
+    fun checkPendingRatings() {
         viewModelScope.launch {
-            delay(5000)
-            _uiState.update {
-                it.copy(
-                    showRatingDialog = true,
-                    pendingOrderId = "101"
-                )
+            delay(3000)
+            runCatching {
+                val purchases = foodRepository.getMyPurchases()
+                val pendingOrder = purchases.firstOrNull { !it.isRated }
+                
+                if (pendingOrder != null) {
+                    _uiState.update {
+                        it.copy(
+                            showRatingDialog = true,
+                            pendingOrderId = pendingOrder.id
+                        )
+                    }
+                }
+            }.onFailure { }
+        }
+    }
+
+    fun startWaterReminder() {
+        waterReminderJob?.cancel()
+        waterReminderJob = viewModelScope.launch {
+            while (true) {
+                delay(_uiState.value.waterReminderIntervalMinutes * 60 * 1000L)
+                _uiState.update { 
+                    it.copy(
+                        showWaterReminder = true,
+                        waterReminderPhrase = waterPhrases.random()
+                    ) 
+                }
             }
         }
+    }
+
+    fun dismissWaterReminder() {
+        _uiState.update { it.copy(showWaterReminder = false) }
+    }
+
+    fun setWaterReminderInterval(minutes: Int) {
+        _uiState.update { it.copy(waterReminderIntervalMinutes = minutes) }
+        startWaterReminder() // Reinicia el contador con el nuevo tiempo
     }
 
     fun dismissRatingDialog() {
