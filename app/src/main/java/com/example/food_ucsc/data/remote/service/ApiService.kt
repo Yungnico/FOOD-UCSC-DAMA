@@ -19,6 +19,9 @@ interface ApiService {
     @GET("productos")
     suspend fun getProducts(): List<ProductDetailDto>
 
+    @GET("productos/tendencias")
+    suspend fun getTrendingProducts(): List<ProductDetailDto>
+
     @POST("login")
     suspend fun login(@Body request: LoginRequestDto): AuthResponseDto
 

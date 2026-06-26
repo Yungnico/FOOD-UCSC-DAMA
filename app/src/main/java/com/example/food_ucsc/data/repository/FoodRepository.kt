@@ -7,6 +7,7 @@ import com.example.food_ucsc.data.remote.service.ApiService
 import com.example.food_ucsc.ui.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
 class FoodRepository(private val apiService: ApiService) {
 
@@ -20,6 +21,19 @@ class FoodRepository(private val apiService: ApiService) {
 
     suspend fun getProducts(): List<FoodItem> = withContext(Dispatchers.IO) {
         runCatching { apiService.getProducts().map { it.toFoodItem() } }.getOrDefault(emptyList())
+    }
+
+    suspend fun getTrendingProducts(): List<FoodItem> = withContext(Dispatchers.IO) {
+        try {
+            apiService.getTrendingProducts().map { it.toFoodItem() }
+        } catch (e: HttpException) {
+            if (e.code() == 404) {
+                Log.d("Repository", "Endpoint de tendencias no disponible; usando fallback local")
+                emptyList()
+            } else {
+                throw e
+            }
+        }
     }
 
     suspend fun getProductDetails(): List<ProductDetailDto> = withContext(Dispatchers.IO) {

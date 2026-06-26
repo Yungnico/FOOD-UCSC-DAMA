@@ -44,32 +44,48 @@ class HomeViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
+                // 1. Cargar Categorías y Productos base
                 val categories = runCatching { foodRepository.getCategories() }.getOrDefault(emptyList())
                 val baseProducts = runCatching { foodRepository.getProducts() }.getOrDefault(emptyList())
 
+                // 2. Cargar Locales y Menús (para tener el catálogo completo)
                 val restaurants = runCatching { foodRepository.getRestaurants() }.getOrDefault(emptyList())
                 val menus = restaurants.flatMap { restaurant ->
                     runCatching { foodRepository.getMenusByRestaurant(restaurant.id) }.getOrDefault(emptyList())
                 }
                 val menuProducts = menus.flatMap { it.productos }
-
                 allProducts = (baseProducts + menuProducts).distinctBy { it.id }
 
+                // 3. NUEVA LÓGICA: Cargar productos en TENDENCIA desde el servidor
+                Log.d("HomeVM", "Iniciando carga de tendencias...")
+                val trendingResult = runCatching { foodRepository.getTrendingProducts() }
+                
+                val recommendedItems = if (trendingResult.isSuccess) {
+                    val items = trendingResult.getOrNull() ?: emptyList()
+                    Log.d("HomeVM", "Tendencias cargadas exitosamente: ${items.size} productos")
+                    if (items.isEmpty()) {
+                        Log.d("HomeVM", "Sin tendencias disponibles, usando backup de 10 productos")
+                        allProducts.take(10)
+                    } else {
+                        items
+                    }
+                } else {
+                    Log.e("HomeVM", "Error al cargar tendencias: ${trendingResult.exceptionOrNull()?.message}")
+                    Log.d("HomeVM", "Usando backup de 10 productos por error en servidor")
+                    allProducts.take(10)
+                }
+
+                // 4. Sincronizar Favoritos del usuario actual
                 val userId = sessionManager.getUserId()
                 val favoritesRaw = if (userId != null) {
                     runCatching { foodRepository.getFavoritesByUser(userId) }.getOrDefault(emptyList())
                 } else {
                     runCatching { foodRepository.getMyFavoritesRaw() }.getOrDefault(emptyList())
                 }
+                
                 val favoriteProductIds = favoritesRaw.map { it.productoId }.toSet()
                 val favoriteMap = favoritesRaw.associate { it.productoId to it.id }
                 val favoriteItems = allProducts.filter { it.id in favoriteProductIds }
-
-                val recommendedItems = if (menuProducts.isNotEmpty()) {
-                    menuProducts.distinctBy { it.id }.take(6)
-                } else {
-                    allProducts.take(6)
-                }
 
                 val tips = runCatching { foodRepository.getTips() }.getOrDefault(emptyList())
                 val challenges = runCatching { foodRepository.getChallenges() }.getOrDefault(emptyList())
@@ -88,23 +104,9 @@ class HomeViewModel(
                     )
                 }
 
-                applyFiltersToState()
             } catch (e: Exception) {
-                Log.e("HomeVM", "Error general: ${e.message}")
-                _uiState.update {
-                    it.copy(
-                        categories = emptyList(),
-                        recommendedItems = emptyList(),
-                        favoriteItems = emptyList(),
-                        favoriteProductIds = emptySet(),
-                        favoriteMap = emptyMap(),
-                        tips = emptyList(),
-                        challenges = emptyList(),
-                        searchResults = emptyList(),
-                        isLoading = false,
-                        error = "Error de conexión"
-                    )
-                }
+                Log.e("HomeVM", "Error en loadHomeData: ${e.message}")
+                _uiState.update { it.copy(isLoading = false, error = "Error de conexión") }
             }
         }
     }
@@ -124,36 +126,12 @@ class HomeViewModel(
                             favoriteMap = state.favoriteMap - productId
                         )
                     }
-                    val resolvedFavoriteId = favoriteId ?: run {
-                        val userId = sessionManager.getUserId()
-                        val serverFavorite = userId?.let { user ->
-                            foodRepository.getFavoritesByUser(user).firstOrNull { it.productoId == productId }
-                        }
-                        serverFavorite?.id
-                    }
-                    if (resolvedFavoriteId != null) {
-                        foodRepository.deleteFavorite(resolvedFavoriteId)
+                    if (favoriteId != null) {
+                        foodRepository.deleteFavorite(favoriteId)
                     }
                 } else {
-                    val userId = sessionManager.getUserId()
-                    if (userId == null) {
-                        throw IllegalStateException("No hay usuario autenticado")
-                    }
-
-                    val serverFavorite = foodRepository.getFavoritesByUser(userId).firstOrNull { it.productoId == productId }
-                    if (serverFavorite != null) {
-                        _uiState.update { state ->
-                            state.copy(
-                                favoriteProductIds = state.favoriteProductIds + productId,
-                                favoriteItems = state.favoriteItems.ifEmpty {
-                                    allProducts.filter { it.id == productId }
-                                },
-                                favoriteMap = state.favoriteMap + (productId to serverFavorite.id)
-                            )
-                        }
-                        return@launch
-                    }
-
+                    val userId = sessionManager.getUserId() ?: throw IllegalStateException("No hay usuario")
+                    
                     val productToAdd = allProducts.find { it.id == productId }
                     _uiState.update { state ->
                         state.copy(
@@ -168,72 +146,51 @@ class HomeViewModel(
                 }
             } catch (e: Exception) {
                 Log.e("HomeVM", "Error en favorito: ${e.message}")
-                loadHomeData()
+                loadHomeData() // Re-sincronizar
             }
         }
     }
 
-    fun dismissWaterReminder() {
-        _uiState.update { it.copy(showWaterReminder = false) }
-    }
-
-    fun setWaterReminderInterval(minutes: Int) {
-        _uiState.update { it.copy(waterReminderIntervalMinutes = minutes) }
-        startWaterReminder()
-    }
-
-    fun dismissRatingDialog() {
-        _uiState.update { it.copy(showRatingDialog = false) }
-    }
-
-    fun toggleFilterSheet(show: Boolean) {
-        _uiState.update { it.copy(showFilterSheet = show) }
-    }
-
-    fun onFilterSelected(filter: String) {
-        _uiState.update { state ->
-            state.copy(selectedNutritionalFilter = filter, showFilterSheet = false)
-        }
-        applyFiltersToState()
-    }
-
+    // Métodos de UI (Buscador, Filtros, Recordatorios)
     fun onSearchQueryChange(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
         applyFiltersToState()
     }
 
     private fun applyFiltersToState() {
-        val state = _uiState.value
-        val query = state.searchQuery.trim()
-
-        if (query.isEmpty() && state.selectedNutritionalFilter == "Todos") {
+        val query = _uiState.value.searchQuery.trim()
+        if (query.isEmpty() && _uiState.value.selectedNutritionalFilter == "Todos") {
             _uiState.update { it.copy(searchResults = emptyList()) }
             return
         }
-
         val results = allProducts.filter { it.nombre.contains(query, ignoreCase = true) }
         _uiState.update { it.copy(searchResults = results) }
     }
 
+    fun onFilterSelected(filter: String) {
+        _uiState.update { it.copy(selectedNutritionalFilter = filter, showFilterSheet = false) }
+        applyFiltersToState()
+    }
+
+    fun toggleFilterSheet(show: Boolean) { _uiState.update { it.copy(showFilterSheet = show) } }
+    fun dismissWaterReminder() { _uiState.update { it.copy(showWaterReminder = false) } }
+    fun setWaterReminderInterval(minutes: Int) {
+        _uiState.update { it.copy(waterReminderIntervalMinutes = minutes) }
+        startWaterReminder()
+    }
+    fun dismissRatingDialog() { _uiState.update { it.copy(showRatingDialog = false) } }
     private fun checkPendingRatings() {
         viewModelScope.launch {
             delay(5000)
             _uiState.update { it.copy(showRatingDialog = true, pendingOrderId = "101") }
         }
     }
-
     private fun startWaterReminder() {
         waterReminderJob?.cancel()
-        val intervalMinutes = _uiState.value.waterReminderIntervalMinutes.coerceAtLeast(1)
         waterReminderJob = viewModelScope.launch {
             while (true) {
-                delay(intervalMinutes * 60_000L)
-                _uiState.update {
-                    it.copy(
-                        showWaterReminder = true,
-                        waterReminderPhrase = waterPhrases.random()
-                    )
-                }
+                delay(_uiState.value.waterReminderIntervalMinutes * 60_000L)
+                _uiState.update { it.copy(showWaterReminder = true, waterReminderPhrase = waterPhrases.random()) }
             }
         }
     }
