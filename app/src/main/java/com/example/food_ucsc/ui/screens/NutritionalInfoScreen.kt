@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.NutritionalInfoViewModel
 
@@ -34,10 +36,10 @@ fun NutritionalInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Información nutricional", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.profile_nutrition_info), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
@@ -54,7 +56,7 @@ fun NutritionalInfoScreen(
         ) {
             if (uiState.error != null) {
                 Text(
-                    text = uiState.error ?: "No se pudo cargar la información nutricional",
+                    text = uiState.error ?: stringResource(R.string.load_error_nutrition),
                     color = Color(0xFFB3261E),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
@@ -77,7 +79,7 @@ fun NutritionalInfoScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Calorías de Hoy",
+                        text = stringResource(R.string.nutri_today),
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 16.sp
                     )
@@ -101,7 +103,7 @@ fun NutritionalInfoScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Meta diaria: ${uiState.calorieGoal} kcal",
+                        text = stringResource(R.string.nutri_daily_goal, uiState.calorieGoal),
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
@@ -111,7 +113,7 @@ fun NutritionalInfoScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Comparación semanal",
+                text = stringResource(R.string.nutri_weekly_comparison),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -168,7 +170,7 @@ fun NutritionalInfoScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Detalle por productos comprados",
+                text = stringResource(R.string.nutri_purchased_items),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -177,7 +179,7 @@ fun NutritionalInfoScreen(
 
             if (uiState.purchasedItems.isEmpty()) {
                 Text(
-                    text = "Aún no hay compras registradas para mostrar.",
+                    text = stringResource(R.string.nutri_no_purchases),
                     color = Color.Gray,
                     fontSize = 14.sp
                 )

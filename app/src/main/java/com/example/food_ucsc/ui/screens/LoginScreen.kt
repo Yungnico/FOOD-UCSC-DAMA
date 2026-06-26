@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.AuthViewModel
@@ -77,7 +79,7 @@ fun LoginScreen(
                 // Logo superior
                 Icon(
                     imageVector = Icons.Default.Whatshot,
-                    contentDescription = "Logo",
+                    contentDescription = stringResource(R.string.logo_desc),
                     tint = moradoPrincipal,
                     modifier = Modifier.size(80.dp)
                 )
@@ -85,7 +87,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Bienvenido",
+                    text = stringResource(R.string.welcome),
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
                     color = moradoPrincipal
@@ -94,7 +96,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Inicia sesión para continuar",
+                    text = stringResource(R.string.login_continue),
                     color = textoSecundario,
                     fontSize = 15.sp
                 )
@@ -107,7 +109,7 @@ fun LoginScreen(
                 ) {
 
                     Text(
-                        text = "CORREO",
+                        text = stringResource(R.string.email_label).uppercase(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = textoSecundario
@@ -145,7 +147,7 @@ fun LoginScreen(
                 ) {
 
                     Text(
-                        text = "CONTRASEÑA",
+                        text = stringResource(R.string.password_label).uppercase(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = textoSecundario
@@ -212,7 +214,7 @@ fun LoginScreen(
                         )
                     } else {
                         Text(
-                            text = "Iniciar sesión",
+                            text = stringResource(R.string.login_button),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -226,7 +228,7 @@ fun LoginScreen(
                     onClick = { }
                 ) {
                     Text(
-                        text = "¿Olvidaste tu contraseña?",
+                        text = stringResource(R.string.forgot_password),
                         color = textoSecundario,
                         fontSize = 13.sp
                     )
@@ -238,7 +240,7 @@ fun LoginScreen(
                     }
                 ) {
                     Text(
-                        text = "¡Regístrate!",
+                        text = stringResource(R.string.register_prompt),
                         color = moradoPrincipal,
                         fontWeight = FontWeight.Bold
                     )

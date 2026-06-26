@@ -16,11 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.models.Order
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
@@ -37,10 +39,10 @@ fun OrderHistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis pedidos", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.profile_order_history), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
@@ -67,7 +69,7 @@ fun OrderHistoryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = uiState.error ?: "No se pudo cargar el historial",
+                        text = uiState.error ?: stringResource(R.string.load_error_orders),
                         color = Color(0xFFB3261E),
                         modifier = Modifier.padding(24.dp)
                     )
@@ -84,7 +86,7 @@ fun OrderHistoryScreen(
                     if (uiState.orders.isEmpty()) {
                         item {
                             Text(
-                                text = "Todavía no tienes compras registradas.",
+                                text = stringResource(R.string.no_orders),
                                 color = Color.Gray,
                                 modifier = Modifier.padding(16.dp)
                             )
@@ -174,14 +176,14 @@ fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
                 
                 if (order.isRated) {
                     Text(
-                        text = "Calificado",
+                        text = stringResource(R.string.rated),
                         color = Color.Gray,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 } else {
                     TextButton(onClick = onRateClick) {
-                        Text("Calificar")
+                        Text(stringResource(R.string.rate))
                     }
                 }
             }

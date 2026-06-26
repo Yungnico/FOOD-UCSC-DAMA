@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.AuthViewModel
@@ -69,7 +71,7 @@ fun RegisterScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
+                    contentDescription = stringResource(R.string.back_label),
                     tint = Color.White,
                     modifier = Modifier.size(32.dp)
                 )
@@ -94,7 +96,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
-                    text = "Crear una nueva\ncuenta",
+                    text = stringResource(R.string.create_account),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1D1D1D),
@@ -104,7 +106,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "¿Ya estás registrado? Inicia sesión aquí",
+                    text = stringResource(R.string.already_registered),
                     color = textoSecundario,
                     fontSize = 13.sp
                 )
@@ -112,7 +114,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(40.dp))
 
                 // NAME
-                InputLabel("NOMBRE", textoSecundario)
+                InputLabel(stringResource(R.string.name_label).uppercase(), textoSecundario)
 
                 CustomTextField(
                     value = nombre,
@@ -122,7 +124,7 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                InputLabel("APELLIDO PATERNO", textoSecundario)
+                InputLabel(stringResource(R.string.last_name_paternal_label).uppercase(), textoSecundario)
                 CustomTextField(
                     value = apellidoPaterno,
                     onValueChange = { apellidoPaterno = it },
@@ -131,7 +133,7 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                InputLabel("APELLIDO MATERNO", textoSecundario)
+                InputLabel(stringResource(R.string.last_name_maternal_label).uppercase(), textoSecundario)
                 CustomTextField(
                     value = apellidoMaterno,
                     onValueChange = { apellidoMaterno = it },
@@ -141,7 +143,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // EMAIL
-                InputLabel("CORREO", textoSecundario)
+                InputLabel(stringResource(R.string.email_label).uppercase(), textoSecundario)
 
                 CustomTextField(
                     value = email,
@@ -153,7 +155,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // PASSWORD
-                InputLabel("CONTRASEÑA", textoSecundario)
+                InputLabel(stringResource(R.string.password_label).uppercase(), textoSecundario)
 
                 CustomTextField(
                     value = password,
@@ -204,7 +206,7 @@ fun RegisterScreen(
                         )
                     } else {
                         Text(
-                            text = "Registrarse",
+                            text = stringResource(R.string.register_button),
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp

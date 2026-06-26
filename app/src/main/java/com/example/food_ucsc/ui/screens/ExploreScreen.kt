@@ -35,7 +35,13 @@ fun ExploreScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val filters = listOf("Todos", "Cerca", "Rápidos", "Populares", "Abierto ahora")
+    val filters = listOf(
+        stringResource(R.string.all),
+        stringResource(R.string.nearby),
+        stringResource(R.string.quick),
+        stringResource(R.string.popular),
+        stringResource(R.string.open_now)
+    )
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
@@ -98,7 +104,7 @@ fun ExploreScreen(
 
             // Lista de Locales
             Text(
-                text = "Locales disponibles",
+                text = stringResource(R.string.explore_available_locales),
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold

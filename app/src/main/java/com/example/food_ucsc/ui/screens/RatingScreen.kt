@@ -14,11 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.RatingViewModel
 
@@ -40,21 +42,21 @@ fun RatingScreen(
             onDismissRequest = { navController.popBackStack() },
             confirmButton = {
                 TextButton(onClick = { navController.popBackStack() }) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.accept))
                 }
             },
-            title = { Text("¡Gracias!") },
-            text = { Text("Tu opinión ha sido enviada exitosamente.") }
+            title = { Text(stringResource(R.string.thank_you)) },
+            text = { Text(stringResource(R.string.rating_sent_success)) }
         )
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Calificar pedido", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.calify_order), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
@@ -80,7 +82,7 @@ fun RatingScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Pedido #$orderId",
+                text = stringResource(R.string.order_number, orderId),
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
@@ -89,7 +91,7 @@ fun RatingScreen(
 
             // Order Rating Section
             RatingSection(
-                title = "¿Cómo estuvo tu pedido?",
+                title = stringResource(R.string.how_was_order),
                 rating = uiState.orderRating,
                 onRatingChange = { viewModel.updateOrderRating(it) }
             )
@@ -101,8 +103,8 @@ fun RatingScreen(
                 value = uiState.comment,
                 onValueChange = { viewModel.updateComment(it) },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Cuéntanos más (opcional)") },
-                placeholder = { Text("Escribe tu comentario aquí...") },
+                label = { Text(stringResource(R.string.order_comment_label)) },
+                placeholder = { Text(stringResource(R.string.order_comment_placeholder)) },
                 minLines = 3,
                 maxLines = 5,
                 shape = RoundedCornerShape(12.dp)
@@ -112,7 +114,7 @@ fun RatingScreen(
 
             // Restaurant Rating Section
             RatingSection(
-                title = "¿Cómo calificarías al local?",
+                title = stringResource(R.string.how_was_place),
                 rating = uiState.restaurantRating,
                 onRatingChange = { viewModel.updateRestaurantRating(it) }
             )
@@ -132,7 +134,7 @@ fun RatingScreen(
                 if (uiState.isLoading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Enviar calificación", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.send_rating), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -160,7 +162,7 @@ fun RatingSection(
             for (i in 1..5) {
                 Icon(
                     imageVector = if (i <= rating) Icons.Default.Star else Icons.Default.StarBorder,
-                    contentDescription = "Estrella $i",
+                    contentDescription = stringResource(R.string.stars_desc, i),
                     tint = if (i <= rating) Color(0xFFFFB74D) else Color.Gray,
                     modifier = Modifier
                         .size(48.dp)

@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.ui.components.FoodItemCard
 import com.example.food_ucsc.ui.models.Restaurant
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
@@ -43,10 +45,10 @@ fun RestaurantDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = uiState.restaurant?.nombre ?: "Detalle") },
+                title = { Text(text = uiState.restaurant?.nombre ?: stringResource(R.string.restaurant_detail_default)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -65,7 +67,7 @@ fun RestaurantDetailScreen(
         } else if (uiState.error != null) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 Text(
-                    text = uiState.error ?: "No se pudo cargar el detalle del local",
+                    text = uiState.error ?: stringResource(R.string.load_error_detail),
                     color = Color(0xFFB3261E),
                     modifier = Modifier.padding(24.dp)
                 )
@@ -142,7 +144,7 @@ fun RestaurantHeader(restaurant: Restaurant) {
         ) {
             InfoChip(icon = Icons.Default.AccessTime, text = "${restaurant.tiempo_espera_estimado} min")
             InfoChip(icon = Icons.Default.Star, text = restaurant.rating.toString())
-            InfoChip(icon = Icons.Default.Phone, text = "Contacto")
+            InfoChip(icon = Icons.Default.Phone, text = stringResource(R.string.restaurant_contact))
         }
     }
 }

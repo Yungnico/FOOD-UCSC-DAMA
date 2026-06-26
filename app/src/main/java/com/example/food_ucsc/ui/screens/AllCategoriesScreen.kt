@@ -11,23 +11,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.models.Category
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllCategoriesScreen(navController: NavController, categories: List<Category>) {
+    val otherCategory = stringResource(R.string.otros)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Todas las Categorías") },
+                title = { Text(stringResource(R.string.all_categories_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Atrás"
+                            contentDescription = stringResource(R.string.back_desc)
                         )
                     }
                 },
@@ -47,7 +51,7 @@ fun AllCategoriesScreen(navController: NavController, categories: List<Category>
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(categories.filter { it.name != "Otros" }) { category ->
+            items(categories.filter { it.name != otherCategory }) { category ->
                 CategoryListItem(category = category) {
                     navController.navigate(Screen.Category.createRoute(category.name))
                 }

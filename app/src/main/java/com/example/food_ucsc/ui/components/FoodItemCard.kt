@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.food_ucsc.R
 import com.example.food_ucsc.ui.models.FoodItem
 
 @Composable
@@ -91,7 +93,7 @@ fun FoodItemCard(
                             modifier = Modifier.height(32.dp)
                         ) {
                             Text(
-                                text = "Lo compré",
+                                text = stringResource(R.string.buy_it),
                                 fontSize = 12.sp,
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold
@@ -110,7 +112,7 @@ fun FoodItemCard(
             ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                    contentDescription = "Favorito",
+                    contentDescription = stringResource(R.string.favorite_desc),
                     tint = if (isFavorite) Color(0xFFF59E0B) else Color.Gray,
                     modifier = Modifier.size(24.dp)
                 )

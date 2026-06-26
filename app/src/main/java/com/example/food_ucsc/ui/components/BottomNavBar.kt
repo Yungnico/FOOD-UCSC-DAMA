@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 
 @Composable
@@ -43,7 +45,7 @@ fun BottomNavBar(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             NavItem(
-                label = "Home",
+                label = stringResource(R.string.nav_home),
                 icon = Icons.Default.Home,
                 isActive = currentRoute == Screen.Home.route
             ) {
@@ -58,7 +60,7 @@ fun BottomNavBar(navController: NavController) {
                 }
             }
             NavItem(
-                label = "Explore",
+                label = stringResource(R.string.nav_explore),
                 icon = Icons.Default.Explore,
                 isActive = currentRoute == Screen.Explore.route
             ) {
@@ -73,7 +75,7 @@ fun BottomNavBar(navController: NavController) {
                 }
             }
             NavItem(
-                label = "Profile",
+                label = stringResource(R.string.nav_profile),
                 icon = Icons.Default.Person,
                 isActive = currentRoute == Screen.Profile.route
             ) {

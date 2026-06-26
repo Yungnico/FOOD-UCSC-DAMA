@@ -46,6 +46,7 @@ fun HomeScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showIntervalDialog by remember { mutableStateOf(false) }
+    val allFilter = stringResource(R.string.all)
 
     // Comprobar pedidos pendientes al entrar
     LaunchedEffect(Unit) {
@@ -56,8 +57,8 @@ fun HomeScreen(
     if (uiState.showRatingDialog && uiState.pendingOrderId != null) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissRatingDialog() },
-            title = { Text("¡Tu opinión nos importa!") },
-            text = { Text("¿Cómo estuvo tu último pedido? Ayúdanos a mejorar calificando tu experiencia.") },
+            title = { Text(stringResource(R.string.thank_you)) },
+            text = { Text(stringResource(R.string.rate_last_order_prompt)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -66,12 +67,12 @@ fun HomeScreen(
                         navController.navigate(Screen.Rating.createRoute(orderId))
                     }
                 ) {
-                    Text("Calificar Ahora")
+                    Text(stringResource(R.string.rate_now))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.dismissRatingDialog() }) {
-                    Text("Más tarde")
+                    Text(stringResource(R.string.later))
                 }
             }
         )
@@ -82,13 +83,13 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { viewModel.dismissWaterReminder() },
             icon = { Icon(Icons.Default.WaterDrop, contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(48.dp)) },
-            title = { Text("¡Hora de hidratarse!", fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.water_reminder_title), fontWeight = FontWeight.Bold) },
             text = { 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(uiState.waterReminderPhrase, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(onClick = { showIntervalDialog = true }) {
-                        Text("Cambiar frecuencia (actual: ${uiState.waterReminderIntervalMinutes} min)")
+                        Text(stringResource(R.string.water_reminder_change_frequency, uiState.waterReminderIntervalMinutes))
                     }
                 }
             },
@@ -97,7 +98,7 @@ fun HomeScreen(
                     onClick = { viewModel.dismissWaterReminder() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
                 ) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.accept))
                 }
             }
         )
@@ -107,7 +108,7 @@ fun HomeScreen(
     if (showIntervalDialog) {
         AlertDialog(
             onDismissRequest = { showIntervalDialog = false },
-            title = { Text("Frecuencia de recordatorio") },
+            title = { Text(stringResource(R.string.water_reminder_frequency_title)) },
             text = {
                 Column {
                     val intervals = listOf(30, 60, 90, 120)
@@ -129,14 +130,14 @@ fun HomeScreen(
                                     showIntervalDialog = false 
                                 }
                             )
-                            Text(text = "Cada $minutes minutos", modifier = Modifier.padding(start = 8.dp))
+                            Text(text = stringResource(R.string.water_reminder_every_minutes, minutes), modifier = Modifier.padding(start = 8.dp))
                         }
                     }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { showIntervalDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -169,10 +170,10 @@ fun HomeScreen(
                 query = uiState.searchQuery,
                 onQueryChange = { viewModel.onSearchQueryChange(it) },
                 onFilterClick = { viewModel.toggleFilterSheet(true) },
-                hasActiveFilter = uiState.selectedNutritionalFilter != "Todos"
+                hasActiveFilter = uiState.selectedNutritionalFilter != allFilter
             )
 
-            if (uiState.searchQuery.isNotEmpty() || uiState.selectedNutritionalFilter != "Todos") {
+            if (uiState.searchQuery.isNotEmpty() || uiState.selectedNutritionalFilter != allFilter) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -185,9 +186,9 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)
                     )
-                    if (uiState.selectedNutritionalFilter != "Todos") {
+                    if (uiState.selectedNutritionalFilter != allFilter) {
                         AssistChip(
-                            onClick = { viewModel.onFilterSelected("Todos") },
+                            onClick = { viewModel.onFilterSelected(allFilter) },
                             label = { Text(uiState.selectedNutritionalFilter) },
                             trailingIcon = { Icon(Icons.Default.Close, null, Modifier.size(16.dp)) },
                             colors = AssistChipDefaults.assistChipColors(labelColor = Color(0xFF6750A4))
@@ -240,8 +241,8 @@ fun HomeScreen(
                             Icon(Icons.Default.WaterDrop, null, tint = Color(0xFF2196F3))
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("Recordatorio de agua", fontWeight = FontWeight.Bold, color = Color(0xFF1976D2))
-                                Text("Configurado cada ${uiState.waterReminderIntervalMinutes} min", fontSize = 12.sp)
+                                Text(stringResource(R.string.water_reminder_banner_title), fontWeight = FontWeight.Bold, color = Color(0xFF1976D2))
+                                Text(stringResource(R.string.water_reminder_banner_subtitle, uiState.waterReminderIntervalMinutes), fontSize = 12.sp)
                             }
                         }
                     }
@@ -289,7 +290,7 @@ fun Header(
         ) {
             Icon(
                 imageVector = Icons.Default.RestaurantMenu,
-                contentDescription = "Menú de comida",
+                contentDescription = stringResource(R.string.food_menu_desc),
                 tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
@@ -313,13 +314,13 @@ fun Header(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = { onQueryChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = Color.Gray)
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear), tint = Color.Gray)
                         }
                     }
                     IconButton(onClick = onFilterClick) {
                         Icon(
                             imageVector = Icons.Default.Tune, 
-                            contentDescription = "Filtros nutricionales",
+                            contentDescription = stringResource(R.string.nutritional_filters),
                             tint = if (hasActiveFilter) Color(0xFF6750A4) else Color.Gray
                         )
                     }
@@ -343,7 +344,12 @@ fun NutritionalFilterContent(
     selectedFilter: String,
     onFilterSelected: (String) -> Unit
 ) {
-    val filters = listOf("Todos", "Bajo en calorías", "Proteico", "Saludable")
+    val filters = listOf(
+        stringResource(R.string.all),
+        stringResource(R.string.low_calories),
+        stringResource(R.string.protein_rich),
+        stringResource(R.string.saludable)
+    )
     
     Column(
         modifier = Modifier
@@ -352,7 +358,7 @@ fun NutritionalFilterContent(
             .padding(bottom = 32.dp)
     ) {
         Text(
-            text = "Filtros nutricionales",
+            text = stringResource(R.string.nutritional_filters_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -384,8 +390,9 @@ fun NutritionalFilterContent(
 
 @Composable
 fun CategorySection(categories: List<Category>, navController: NavController) {
-    val displayCategories = categories.filter { it.name != "Otros" }.take(5) +
-            (categories.find { it.name == "Otros" } ?: Category("Otros", Icons.Default.MoreHoriz))
+    val otherCategory = stringResource(R.string.otros)
+    val displayCategories = categories.filter { it.name != otherCategory }.take(5) +
+            (categories.find { it.name == otherCategory } ?: Category(otherCategory, Icons.Default.MoreHoriz))
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
@@ -408,7 +415,7 @@ fun CategorySection(categories: List<Category>, navController: NavController) {
                             icon = category.icon,
                             modifier = Modifier.weight(1f),
                             onClick = {
-                                if (category.name == "Otros") {
+                                if (category.name == otherCategory) {
                                     navController.navigate(Screen.AllCategories.route)
                                 } else {
                                     navController.navigate(Screen.Category.createRoute(category.name))
@@ -578,7 +585,7 @@ fun TipsSection(tips: List<HealthTip>) {
     
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text = "Consejos rápidos",
+            text = stringResource(R.string.quick_tips),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -615,7 +622,7 @@ fun ChallengesSection(challenges: List<Challenge>) {
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
-            text = "Desafíos saludables",
+            text = stringResource(R.string.healthy_challenges),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -640,7 +647,7 @@ fun ChallengesSection(challenges: List<Challenge>) {
                     Text(text = challenge.descripcion, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "Recompensa: ${challenge.recompensaPuntos} pts",
+                        text = stringResource(R.string.reward_points, challenge.recompensaPuntos),
                         style = MaterialTheme.typography.labelMedium,
                         color = Color(0xFF4A2B8A)
                     )

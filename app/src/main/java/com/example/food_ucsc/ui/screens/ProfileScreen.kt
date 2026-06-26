@@ -18,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.food_ucsc.R
 import com.example.food_ucsc.navigation.Screen
 import com.example.food_ucsc.ui.viewmodel.AppViewModelProvider
 import com.example.food_ucsc.ui.viewmodel.AuthViewModel
@@ -34,20 +36,20 @@ fun ProfileScreen(
     authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val authUiState by authViewModel.uiState.collectAsState()
-    val displayName = authUiState.user?.nombre?.takeIf { it.isNotBlank() } ?: "Usuario UCSC"
-    val displayEmail = authUiState.user?.email ?: "usuario@ucsc.cl"
+    val displayName = authUiState.user?.nombre?.takeIf { it.isNotBlank() } ?: stringResource(R.string.default_user_name)
+    val displayEmail = authUiState.user?.email ?: stringResource(R.string.default_user_email)
     val userPoints = authUiState.user?.puntos ?: 0
     val calorieTarget = authUiState.user?.caloriasTarget ?: 2200
-    val objectives = authUiState.user?.objetivosSalud ?: "Sin objetivo definido"
+    val objectives = authUiState.user?.objetivosSalud ?: stringResource(R.string.no_goal_defined)
     val calorieProgress = (userPoints.coerceAtMost(calorieTarget)).toFloat() / calorieTarget.toFloat()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi perfil", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.nav_profile), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -102,12 +104,12 @@ fun ProfileScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Puntos acumulados",
+                        text = stringResource(R.string.profile_points),
                         style = MaterialTheme.typography.labelLarge,
                         color = Color(0xFF6750A4)
                     )
                     Text(
-                        text = "$userPoints pts",
+                        text = stringResource(R.string.reward_points, userPoints),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -120,12 +122,12 @@ fun ProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Objetivo de salud: $objectives",
+                        text = stringResource(R.string.profile_health_goal, objectives),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.DarkGray
                     )
                     Text(
-                        text = "Meta calórica diaria: $calorieTarget kcal",
+                        text = stringResource(R.string.profile_daily_calorie_goal, calorieTarget),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray
                     )
@@ -137,22 +139,22 @@ fun ProfileScreen(
             // Menu Options
             ProfileMenuItem(
                 icon = Icons.Default.Info,
-                title = "Información nutricional",
-                subtitle = "Dashboard, calorías y estadísticas",
+                title = stringResource(R.string.profile_nutrition_info),
+                subtitle = stringResource(R.string.profile_nutrition_subtitle),
                 onClick = { navController.navigate(Screen.NutritionalInfo.route) }
             )
             
             ProfileMenuItem(
                 icon = Icons.Default.History,
-                title = "Historial de compras",
-                subtitle = "Mis pedidos anteriores y calificar",
+                title = stringResource(R.string.profile_order_history),
+                subtitle = stringResource(R.string.profile_order_history_subtitle),
                 onClick = { navController.navigate(Screen.OrderHistory.route) }
             )
             
             ProfileMenuItem(
                 icon = Icons.Default.RestaurantMenu,
-                title = "Preferencias alimentarias",
-                subtitle = "Alergias, gustos y alertas de comida",
+                title = stringResource(R.string.profile_food_preferences),
+                subtitle = stringResource(R.string.profile_food_preferences_subtitle),
                 onClick = { /* TODO */ }
             )
             
@@ -170,7 +172,7 @@ fun ProfileScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB3261E)),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cerrar sesión")
+                Text(stringResource(R.string.profile_logout))
             }
         }
     }
