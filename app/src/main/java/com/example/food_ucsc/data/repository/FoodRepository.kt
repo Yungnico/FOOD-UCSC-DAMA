@@ -22,6 +22,11 @@ class FoodRepository(private val apiService: ApiService) {
         runCatching { apiService.getProducts().map { it.toFoodItem() } }.getOrDefault(emptyList())
     }
 
+    // Quitamos el runCatching para que el ViewModel reciba el error real
+    suspend fun getTrendingProducts(): List<FoodItem> = withContext(Dispatchers.IO) {
+        apiService.getTrendingProducts().map { it.toFoodItem() }
+    }
+
     suspend fun getProductDetails(): List<ProductDetailDto> = withContext(Dispatchers.IO) {
         runCatching { apiService.getProducts() }.getOrDefault(emptyList())
     }

@@ -7,7 +7,7 @@
     <string name="menu">Explorar menú</string>
     <string name="search">Buscar platos</string>
     <string name="category">Categorias</string>
-    <string name="recommended">Recomendados</string>
+    <string name="recommended">Tendencias</string>
     <string name="favorite">Favoritos</string>
     <string name="search_locales">Buscar locales</string>
     <string name="search_results_for">Resultados para "%1$s"</string>
