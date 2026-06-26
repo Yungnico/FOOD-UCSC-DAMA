@@ -33,10 +33,19 @@ class CategoryViewModel(
                 val products = foodRepository.getProductDetails()
                 
                 // Cargar favoritos
-                val favorites = try {
-                    foodRepository.getMyFavoritesRaw()
-                } catch (e: Exception) {
-                    emptyList()
+                val userId = sessionManager.getUserId()
+                val favorites = if (userId != null) {
+                    try {
+                        foodRepository.getFavoritesByUser(userId)
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
+                } else {
+                    try {
+                        foodRepository.getMyFavoritesRaw()
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
                 }
                 val favIds = favorites.map { it.productoId }.toSet()
                 val favMap = favorites.associate { it.productoId to it.id }
@@ -113,6 +122,18 @@ class CategoryViewModel(
                     val userId = sessionManager.getUserId()
                     if (userId == null) {
                         throw IllegalStateException("No hay usuario autenticado")
+                    }
+                    val existingFavorite = runCatching { foodRepository.getFavoritesByUser(userId) }
+                        .getOrDefault(emptyList())
+                        .firstOrNull { it.productoId == productId }
+                    if (existingFavorite != null) {
+                        _uiState.update { state ->
+                            state.copy(
+                                favoriteProductIds = state.favoriteProductIds + productId,
+                                favoriteMap = state.favoriteMap + (productId to existingFavorite.id)
+                            )
+                        }
+                        return@launch
                     }
                     val newFav = foodRepository.addFavorite(userId, productId)
                     _uiState.update { state ->
