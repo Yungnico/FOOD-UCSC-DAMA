@@ -104,4 +104,8 @@ class FoodRepository(private val apiService: ApiService) {
     suspend fun ratePurchase(purchaseId: Int, rating: Int): PurchaseDto = withContext(Dispatchers.IO) {
         apiService.updatePurchaseRating(purchaseId, PurchaseRatingUpdateDto(rating))
     }
+
+    suspend fun registerPurchase(menuProductoId: Int): Map<String, Any> = withContext(Dispatchers.IO) {
+        apiService.registerPurchase(PurchaseRegistrationRequestDto(menuProductoId))
+    }
 }

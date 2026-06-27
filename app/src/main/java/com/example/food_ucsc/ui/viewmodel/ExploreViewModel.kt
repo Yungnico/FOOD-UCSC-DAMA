@@ -1,11 +1,13 @@
 package com.example.food_ucsc.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food_ucsc.data.repository.FoodRepository
 import com.example.food_ucsc.ui.state.ComparisonItem
 import com.example.food_ucsc.ui.state.ExploreUiState
 import com.example.food_ucsc.ui.state.PriceInfo
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,19 +67,21 @@ class ExploreViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                // Obtenemos todos los detalles de productos
                 val productsDto = foodRepository.getProductDetails()
                 val restaurants = _uiState.value.restaurants
                 
-                // Agrupamos por nombre de producto (normalizado)
                 val comparison = productsDto.groupBy { it.nombre.trim().lowercase() }
-                    .filter { it.value.size > 1 } // Solo los que están en más de un sitio
+                    .filter { it.value.size > 1 }
                     .map { (name, dtos) ->
                         val prices = dtos.flatMap { dto ->
                             dto.menus.mapNotNull { menu ->
                                 val restName = restaurants.find { it.id == menu.localId }?.nombre
                                 if (restName != null) {
-                                    PriceInfo(restaurantName = restName, price = dto.precioBase)
+                                    PriceInfo(
+                                        restaurantName = restName, 
+                                        price = dto.precioBase,
+                                        productId = dto.id
+                                    )
                                 } else null
                             }
                         }.distinctBy { it.restaurantName }
@@ -102,6 +106,27 @@ class ExploreViewModel(
                         error = "Error al comparar precios: ${e.message}"
                     )
                 }
+            }
+        }
+    }
+
+    fun buyFromComparison(productId: Int, price: Double) {
+        viewModelScope.launch {
+            try {
+                // Registrar en el historial de la API
+                foodRepository.registerPurchase(productId)
+                
+                // Lógica de puntos: valor / 100
+                val points = (price / 100).toInt()
+                
+                _uiState.update { it.copy(purchaseMessage = "¡Compra registrada! Ganaste $points puntos.") }
+                delay(3000)
+                _uiState.update { it.copy(purchaseMessage = null) }
+            } catch (e: Exception) {
+                Log.e("ExploreVM", "Error al comprar: ${e.message}")
+                _uiState.update { it.copy(error = "No se pudo registrar la compra") }
+                delay(3000)
+                _uiState.update { it.copy(error = null) }
             }
         }
     }

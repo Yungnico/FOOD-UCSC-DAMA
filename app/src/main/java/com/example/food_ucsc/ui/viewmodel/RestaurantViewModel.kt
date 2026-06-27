@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food_ucsc.data.local.SessionManager
 import com.example.food_ucsc.data.repository.FoodRepository
+import com.example.food_ucsc.ui.models.FoodItem
 import com.example.food_ucsc.ui.state.RestaurantDetailUiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +30,6 @@ class RestaurantViewModel(
                 val restaurant = foodRepository.getRestaurantById(restaurantId)
                 val menus = foodRepository.getMenusByRestaurant(restaurantId)
                 
-                // Cargamos los favoritos reales del usuario
                 val userId = sessionManager.getUserId()
                 val favorites = if (userId != null) {
                     try {
@@ -58,6 +59,36 @@ class RestaurantViewModel(
                 }
             } catch (ex: Exception) {
                 _uiState.update { it.copy(isLoading = false, error = ex.message) }
+            }
+        }
+    }
+
+    fun buyProduct(product: FoodItem) {
+        viewModelScope.launch {
+            try {
+                // Registramos la compra en la API
+                // Usamos el id del producto como identificador para la compra
+                foodRepository.registerPurchase(product.id)
+                
+                // Calculamos los puntos ganados: precio / 100
+                val puntosGanados = (product.precio_base / 100).toInt()
+                
+                _uiState.update { 
+                    it.copy(purchaseMessage = "¡Compra exitosa! Has ganado $puntosGanados puntos.") 
+                }
+                
+                // Opcional: Recargar datos del usuario para ver los puntos actualizados en el perfil
+                // foodRepository.me() 
+
+                // Limpiar el mensaje después de unos segundos
+                delay(3000)
+                _uiState.update { it.copy(purchaseMessage = null) }
+                
+            } catch (e: Exception) {
+                Log.e("RestaurantVM", "Error al registrar compra: ${e.message}")
+                _uiState.update { it.copy(error = "No se pudo registrar la compra") }
+                delay(3000)
+                _uiState.update { it.copy(error = null) }
             }
         }
     }

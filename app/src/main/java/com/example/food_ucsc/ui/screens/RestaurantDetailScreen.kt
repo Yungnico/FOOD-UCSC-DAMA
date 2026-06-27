@@ -9,10 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,12 +34,21 @@ fun RestaurantDetailScreen(
     viewModel: RestaurantViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(restaurantId) {
         viewModel.loadRestaurantDetails(restaurantId)
     }
 
+    // Mostrar mensaje de compra exitosa y puntos ganados
+    LaunchedEffect(uiState.purchaseMessage) {
+        uiState.purchaseMessage?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(text = uiState.restaurant?.nombre ?: stringResource(R.string.restaurant_detail_default)) },
@@ -92,7 +98,8 @@ fun RestaurantDetailScreen(
                                 item = product,
                                 isFavorite = uiState.favoriteProductIds.contains(product.id),
                                 onFavoriteClick = { viewModel.toggleFavorite(product.id) },
-                                onClick = { /* Podrías navegar al detalle si existiera */ }
+                                onBuyClick = { viewModel.buyProduct(product) },
+                                onClick = { /* Detalle producto */ }
                             )
                         }
                     }
