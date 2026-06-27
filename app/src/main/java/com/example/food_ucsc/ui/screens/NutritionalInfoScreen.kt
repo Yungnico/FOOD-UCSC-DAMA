@@ -42,10 +42,10 @@ fun NutritionalInfoScreen(
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -57,7 +57,7 @@ fun NutritionalInfoScreen(
             if (uiState.error != null) {
                 Text(
                     text = uiState.error ?: stringResource(R.string.load_error_nutrition),
-                    color = Color(0xFFB3261E),
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
@@ -65,7 +65,7 @@ fun NutritionalInfoScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF6750A4))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -74,18 +74,18 @@ fun NutritionalInfoScreen(
                     Icon(
                         imageVector = Icons.Default.LocalFireDepartment,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.nutri_today),
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         fontSize = 16.sp
                     )
                     Text(
                         text = "${uiState.dailyCalories} kcal",
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -98,13 +98,13 @@ fun NutritionalInfoScreen(
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp)),
-                        color = Color(0xFFD0BCFF),
-                        trackColor = Color.White.copy(alpha = 0.2f),
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        trackColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.nutri_daily_goal, uiState.calorieGoal),
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
                 }
@@ -115,7 +115,8 @@ fun NutritionalInfoScreen(
             Text(
                 text = stringResource(R.string.nutri_weekly_comparison),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -126,7 +127,7 @@ fun NutritionalInfoScreen(
                     .fillMaxWidth()
                     .height(250.dp),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 2.dp
             ) {
                 Row(
@@ -152,15 +153,16 @@ fun NutritionalInfoScreen(
                                     .height(barHeight)
                                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                                     .background(
-                                        if (data.calories > uiState.calorieGoal) Color(0xFFB3261E)
-                                        else Color(0xFFEADDFF)
+                                        if (data.calories > uiState.calorieGoal) MaterialTheme.colorScheme.error
+                                        else MaterialTheme.colorScheme.primaryContainer
                                     )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = data.date,
                                 fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -172,7 +174,8 @@ fun NutritionalInfoScreen(
             Text(
                 text = stringResource(R.string.nutri_purchased_items),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -180,7 +183,7 @@ fun NutritionalInfoScreen(
             if (uiState.purchasedItems.isEmpty()) {
                 Text(
                     text = stringResource(R.string.nutri_no_purchases),
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
             } else {
@@ -197,18 +200,22 @@ fun NutritionalInfoScreen(
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFF6750A4))
+                                    .background(MaterialTheme.colorScheme.primary)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text(text = item.name, fontSize = 16.sp)
+                            Text(
+                                text = item.name, 
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
                         Text(
                             text = "${item.calories} kcal",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF6750A4)
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }

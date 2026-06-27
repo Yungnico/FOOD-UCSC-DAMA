@@ -59,19 +59,19 @@ fun RatingScreen(
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
 
             uiState.errorMessage?.let { error ->
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = error,
-                    color = Color(0xFFB3261E),
+                    color = MaterialTheme.colorScheme.error,
                     fontSize = 12.sp
                 )
             }
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -84,7 +84,7 @@ fun RatingScreen(
             Text(
                 text = stringResource(R.string.order_number, orderId),
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -128,11 +128,11 @@ fun RatingScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6750A4)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 enabled = uiState.orderRating > 0 && uiState.restaurantRating > 0 && !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
                     Text(stringResource(R.string.send_rating), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
@@ -152,7 +152,7 @@ fun RatingSection(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF21005D)
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -163,7 +163,7 @@ fun RatingSection(
                 Icon(
                     imageVector = if (i <= rating) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.stars_desc, i),
-                    tint = if (i <= rating) Color(0xFFFFB74D) else Color.Gray,
+                    tint = if (i <= rating) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline,
                     modifier = Modifier
                         .size(48.dp)
                         .clickable { onRatingChange(i) }

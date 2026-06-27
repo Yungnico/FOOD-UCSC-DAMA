@@ -48,24 +48,24 @@ fun CategoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = categoryName) },
+                title = { Text(text = categoryName, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF6750A4),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             if (uiState.categories.isNotEmpty()) {
@@ -90,7 +90,7 @@ fun CategoryScreen(
                                 text = stringResource(R.string.locals_in_category),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                         items(uiState.restaurants) { restaurant ->
@@ -107,7 +107,7 @@ fun CategoryScreen(
                                 text = stringResource(R.string.popular_dishes),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                         items(uiState.items) { item ->
@@ -115,7 +115,7 @@ fun CategoryScreen(
                                 item = item,
                                 isFavorite = uiState.favoriteProductIds.contains(item.id),
                                 onFavoriteClick = { viewModel.toggleFavorite(item.id) },
-                                onClick = { /* Detalle del plato */ }
+                                onClick = { }
                             )
                         }
                     }
@@ -172,14 +172,14 @@ fun CategoryItemSimple(
         Surface(
             modifier = Modifier.size(72.dp),
             shape = RoundedCornerShape(16.dp),
-            color = Color(0xFFEADDFF),
+            color = MaterialTheme.colorScheme.primaryContainer,
             shadowElevation = 2.dp
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = name,
                 modifier = Modifier.padding(20.dp),
-                tint = Color(0xFF21005D)
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -189,7 +189,8 @@ fun CategoryItemSimple(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
             lineHeight = 18.sp,
-            maxLines = 2
+            maxLines = 2,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

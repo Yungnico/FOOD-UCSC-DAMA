@@ -203,7 +203,7 @@ fun HomeScreen(
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -220,7 +220,7 @@ fun HomeScreen(
             when {
                 uiState.isLoading && uiState.categories.isEmpty() && uiState.recommendedItems.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color(0xFF6750A4))
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
 
@@ -246,7 +246,7 @@ fun HomeScreen(
                                 trailingIcon = {
                                     Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_filter), modifier = Modifier.size(16.dp))
                                 },
-                                colors = AssistChipDefaults.assistChipColors(labelColor = Color(0xFF6750A4))
+                                colors = AssistChipDefaults.assistChipColors(labelColor = MaterialTheme.colorScheme.primary)
                             )
                         }
                     }
@@ -355,7 +355,7 @@ fun Header(
             modifier = Modifier
                 .size(width = 80.dp, height = 64.dp)
                 .clip(RoundedCornerShape(topEnd = 32.dp, bottomEnd = 32.dp))
-                .background(Color(0xFFF59E0B)),
+                .background(MaterialTheme.colorScheme.secondary),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -387,16 +387,16 @@ fun Header(
                         Icon(
                             imageVector = Icons.Default.Tune,
                             contentDescription = stringResource(R.string.nutritional_filters),
-                            tint = if (hasActiveFilter) Color(0xFF6750A4) else Color.Gray
+                            tint = if (hasActiveFilter) MaterialTheme.colorScheme.primary else Color.Gray
                         )
                     }
                 }
             },
             shape = RoundedCornerShape(28.dp),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFF3F0F8),
-                unfocusedContainerColor = Color(0xFFF3F0F8),
-                disabledContainerColor = Color(0xFFF3F0F8),
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -442,11 +442,11 @@ fun NutritionalFilterContent(
                 Text(
                     text = filter,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedFilter == filter) Color(0xFF6750A4) else Color.Black,
+                    color = if (selectedFilter == filter) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Normal
                 )
                 if (selectedFilter == filter) {
-                    Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF6750A4))
+                    Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                 }
             }
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
@@ -513,14 +513,14 @@ fun CategoryItem(
         Surface(
             modifier = Modifier.size(72.dp),
             shape = RoundedCornerShape(16.dp),
-            color = Color(0xFFEADDFF),
+            color = MaterialTheme.colorScheme.primaryContainer,
             shadowElevation = 2.dp
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = name,
                 modifier = Modifier.padding(20.dp),
-                tint = Color(0xFF21005D)
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -574,7 +574,7 @@ fun ProductCard(
             .width(150.dp)
             .border(1.dp, Color.LightGray.copy(alpha = 0.5f), RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(12.dp)) {
@@ -582,26 +582,26 @@ fun ProductCard(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFF0F0F0)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = null,
                         modifier = Modifier.size(40.dp),
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = item.nombre, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "$${item.precio_base.toInt()}", fontSize = 14.sp, color = Color(0xFF6750A4), fontWeight = FontWeight.ExtraBold)
+                Text(text = "$${item.precio_base.toInt()}", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold)
             }
             IconButton(onClick = onFavoriteClick, modifier = Modifier.align(Alignment.TopEnd).size(36.dp)) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.favorite_desc),
-                    tint = if (isFavorite) Color(0xFFF59E0B) else Color.Gray,
+                    tint = if (isFavorite) MaterialTheme.colorScheme.secondary else Color.Gray,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -644,9 +644,9 @@ fun TipsSection(tips: List<HealthTip>) {
         Text(text = stringResource(R.string.quick_tips), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(12.dp))
         tips.take(3).forEach { tip ->
-            Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp), color = Color.White, shadowElevation = 1.dp) {
+            Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.surface, shadowElevation = 1.dp) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text(text = tip.categoria, style = MaterialTheme.typography.labelMedium, color = Color(0xFF6750A4), fontWeight = FontWeight.SemiBold)
+                    Text(text = tip.categoria, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = tip.descripcion, style = MaterialTheme.typography.bodyMedium)
                 }
@@ -662,13 +662,13 @@ fun ChallengesSection(challenges: List<Challenge>) {
         Text(text = stringResource(R.string.healthy_challenges), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(12.dp))
         challenges.take(3).forEach { challenge ->
-            Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp), color = Color(0xFFF5F1FF)) {
+            Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(text = challenge.titulo, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = challenge.descripcion, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(6.dp))
-                    Text(text = stringResource(R.string.reward_points, challenge.recompensaPuntos), style = MaterialTheme.typography.labelMedium, color = Color(0xFF4A2B8A))
+                    Text(text = stringResource(R.string.reward_points, challenge.recompensaPuntos), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
         }

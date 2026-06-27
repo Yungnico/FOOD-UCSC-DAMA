@@ -33,7 +33,7 @@ fun FoodItemCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -47,13 +47,13 @@ fun FoodItemCard(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF3F0F8)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.nombre,
-                        tint = Color(0xFF6750A4),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -64,11 +64,12 @@ fun FoodItemCard(
                     Text(
                         text = item.nombre,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = item.descripcion,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp,
                         maxLines = 2
                     )
@@ -82,20 +83,20 @@ fun FoodItemCard(
                             text = "$${item.precio_base.toInt()}",
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 16.sp,
-                            color = Color(0xFF6750A4)
+                            color = MaterialTheme.colorScheme.primary
                         )
                         
                         Button(
                             onClick = onBuyClick,
                             shape = RoundedCornerShape(8.dp),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6750A4)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             modifier = Modifier.height(32.dp)
                         ) {
                             Text(
                                 text = stringResource(R.string.buy_it),
                                 fontSize = 12.sp,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -113,7 +114,7 @@ fun FoodItemCard(
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.favorite_desc),
-                    tint = if (isFavorite) Color(0xFFF59E0B) else Color.Gray,
+                    tint = if (isFavorite) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline,
                     modifier = Modifier.size(24.dp)
                 )
             }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,12 +30,6 @@ fun RegisterScreen(
     navController: NavController,
     authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
-    val moradoPrincipal = Color(0xFF6750A4)
-    val fondoClaro = Color(0xFFFBF8FF)
-    val inputColor = Color(0xFFF3F0F8)
-    val textoSecundario = Color(0xFF7A7A7A)
-
     var nombre by remember { mutableStateOf("") }
     var apellidoPaterno by remember { mutableStateOf("") }
     var apellidoMaterno by remember { mutableStateOf("") }
@@ -55,13 +48,11 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(moradoPrincipal)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-
             Spacer(modifier = Modifier.height(20.dp))
 
             IconButton(
@@ -72,7 +63,7 @@ fun RegisterScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back_label),
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -83,7 +74,7 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        color = fondoClaro,
+                        color = MaterialTheme.colorScheme.background,
                         shape = RoundedCornerShape(
                             topStart = 40.dp,
                             topEnd = 40.dp
@@ -92,14 +83,13 @@ fun RegisterScreen(
                     .padding(horizontal = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
                     text = stringResource(R.string.create_account),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1D1D1D),
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 38.sp
                 )
 
@@ -107,70 +97,64 @@ fun RegisterScreen(
 
                 Text(
                     text = stringResource(R.string.already_registered),
-                    color = textoSecundario,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 // NAME
-                InputLabel(stringResource(R.string.name_label).uppercase(), textoSecundario)
+                InputLabel(stringResource(R.string.name_label).uppercase(), MaterialTheme.colorScheme.onSurfaceVariant)
 
                 CustomTextField(
                     value = nombre,
-                    onValueChange = { nombre = it },
-                    inputColor = inputColor
+                    onValueChange = { nombre = it }
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                InputLabel(stringResource(R.string.last_name_paternal_label).uppercase(), textoSecundario)
+                InputLabel(stringResource(R.string.last_name_paternal_label).uppercase(), MaterialTheme.colorScheme.onSurfaceVariant)
                 CustomTextField(
                     value = apellidoPaterno,
-                    onValueChange = { apellidoPaterno = it },
-                    inputColor = inputColor
+                    onValueChange = { apellidoPaterno = it }
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                InputLabel(stringResource(R.string.last_name_maternal_label).uppercase(), textoSecundario)
+                InputLabel(stringResource(R.string.last_name_maternal_label).uppercase(), MaterialTheme.colorScheme.onSurfaceVariant)
                 CustomTextField(
                     value = apellidoMaterno,
-                    onValueChange = { apellidoMaterno = it },
-                    inputColor = inputColor
+                    onValueChange = { apellidoMaterno = it }
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // EMAIL
-                InputLabel(stringResource(R.string.email_label).uppercase(), textoSecundario)
+                InputLabel(stringResource(R.string.email_label).uppercase(), MaterialTheme.colorScheme.onSurfaceVariant)
 
                 CustomTextField(
                     value = email,
                     onValueChange = { email = it },
-                    inputColor = inputColor,
                     keyboardType = KeyboardType.Email
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // PASSWORD
-                InputLabel(stringResource(R.string.password_label).uppercase(), textoSecundario)
+                InputLabel(stringResource(R.string.password_label).uppercase(), MaterialTheme.colorScheme.onSurfaceVariant)
 
                 CustomTextField(
                     value = password,
                     onValueChange = { password = it },
-                    inputColor = inputColor,
                     isPassword = true
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // FECHA
                 uiState.errorMessage?.let { error ->
                     Text(
                         text = error,
-                        color = Color(0xFFB3261E),
+                        color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -195,24 +179,25 @@ fun RegisterScreen(
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = moradoPrincipal
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.register_button),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
@@ -237,7 +222,6 @@ private fun InputLabel(
 private fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    inputColor: Color,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false
 ) {
@@ -257,10 +241,12 @@ private fun CustomTextField(
             keyboardType = keyboardType
         ),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = inputColor,
-            unfocusedContainerColor = inputColor,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }

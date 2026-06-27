@@ -29,13 +29,6 @@ fun LoginScreen(
     navController: NavController,
     authViewModel: AuthViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-
-    // Colores usados en HomeScreen
-    val moradoPrincipal = Color(0xFF6750A4)
-    val fondoClaro = Color(0xFFFBF8FF)
-    val inputColor = Color(0xFFF3F0F8)
-    val textoSecundario = Color(0xFF7A7A7A)
-
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val uiState by authViewModel.uiState.collectAsState()
@@ -51,36 +44,29 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(moradoPrincipal)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-
             Spacer(modifier = Modifier.height(40.dp))
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        color = fondoClaro,
-                        shape = RoundedCornerShape(
-                            topStart = 36.dp,
-                            topEnd = 36.dp
-                        )
+                        color = MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp)
                     )
                     .padding(horizontal = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Spacer(modifier = Modifier.height(70.dp))
 
-                // Logo superior
                 Icon(
                     imageVector = Icons.Default.Whatshot,
                     contentDescription = stringResource(R.string.logo_desc),
-                    tint = moradoPrincipal,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(80.dp)
                 )
 
@@ -90,93 +76,69 @@ fun LoginScreen(
                     text = stringResource(R.string.welcome),
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
-                    color = moradoPrincipal
+                    color = MaterialTheme.colorScheme.primary
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = stringResource(R.string.login_continue),
-                    color = textoSecundario,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 15.sp
                 )
 
                 Spacer(modifier = Modifier.height(36.dp))
 
-                // NAME
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(R.string.email_label).uppercase(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = textoSecundario
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
                     Spacer(modifier = Modifier.height(6.dp))
-
                     TextField(
                         value = email,
                         onValueChange = { email = it },
                         singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(58.dp),
+                        modifier = Modifier.fillMaxWidth().height(58.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = inputColor,
-                            unfocusedContainerColor = inputColor,
-                            disabledContainerColor = inputColor,
-
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-
-                            focusedTextColor = moradoPrincipal,
-                            unfocusedTextColor = moradoPrincipal
+                            focusedTextColor = MaterialTheme.colorScheme.primary,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // PASSWORD
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(R.string.password_label).uppercase(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = textoSecundario
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
                     Spacer(modifier = Modifier.height(6.dp))
-
                     TextField(
                         value = password,
                         onValueChange = { password = it },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(58.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.fillMaxWidth().height(58.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = inputColor,
-                            unfocusedContainerColor = inputColor,
-                            disabledContainerColor = inputColor,
-
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-
-                            focusedTextColor = moradoPrincipal,
-                            unfocusedTextColor = moradoPrincipal
+                            focusedTextColor = MaterialTheme.colorScheme.primary,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                 }
@@ -186,7 +148,7 @@ fun LoginScreen(
                 uiState.errorMessage?.let { error ->
                     Text(
                         text = error,
-                        color = Color(0xFFB3261E),
+                        color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -194,28 +156,22 @@ fun LoginScreen(
                 }
 
                 Button(
-                    onClick = {
-                        authViewModel.login(email = email, password = password)
-                    },
+                    onClick = { authViewModel.login(email = email, password = password) },
                     enabled = !uiState.isLoading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = moradoPrincipal
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             strokeWidth = 2.dp
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.login_button),
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
@@ -224,24 +180,18 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                TextButton(
-                    onClick = { }
-                ) {
+                TextButton(onClick = { }) {
                     Text(
                         text = stringResource(R.string.forgot_password),
-                        color = textoSecundario,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp
                     )
                 }
 
-                TextButton(
-                    onClick = {
-                        navController.navigate(Screen.Register.route)
-                    }
-                ) {
+                TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
                     Text(
                         text = stringResource(R.string.register_prompt),
-                        color = moradoPrincipal,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 }

@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalPizza
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Restaurant
 import com.example.food_ucsc.data.remote.dto.CategoryDto
 import com.example.food_ucsc.data.remote.dto.ChallengeDto
@@ -47,8 +46,8 @@ fun RestaurantDto.toDomain(): Restaurant {
         longitude = this.longitude,
         tiempo_espera_estimado = this.tiempo_espera_estimado,
         rating = this.rating,
-        icon = Icons.Default.Restaurant, // Default icon
-        bannerColor = 0xFF6750A4 // Default color
+        icon = Icons.Default.Restaurant,
+        bannerColor = 0xFF2D6A44 // Cambiado de morado a Verde Primario
     )
 }
 
@@ -71,7 +70,7 @@ fun FoodItemDto.toDomain(): FoodItem {
         precio_base = this.precioBase,
         categoria_basica = this.categoriaBasica,
         stock = this.stock,
-        icon = Icons.Default.Fastfood // Default icon
+        icon = Icons.Default.Fastfood
     )
 }
 

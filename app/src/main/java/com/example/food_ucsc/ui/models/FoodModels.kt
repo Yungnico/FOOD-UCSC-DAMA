@@ -67,5 +67,5 @@ data class Restaurant(
     val tiempo_espera_estimado: Int,
     val rating: Double,
     val icon: ImageVector,
-    val bannerColor: Long = 0xFF6750A4
+    val bannerColor: Long = 0xFF2D6A44 // Cambiado de morado a Verde Primario
 )
