@@ -52,13 +52,13 @@ fun RestaurantDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF6750A4),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         if (uiState.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
@@ -68,7 +68,7 @@ fun RestaurantDetailScreen(
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 Text(
                     text = uiState.error ?: stringResource(R.string.load_error_detail),
-                    color = Color(0xFFB3261E),
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(24.dp)
                 )
             }
@@ -178,13 +178,13 @@ fun MenuHeader(titulo: String, promociones: String) {
             text = titulo,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1D1B20)
+            color = MaterialTheme.colorScheme.onSurface
         )
         if (promociones.isNotEmpty()) {
             Surface(
-                color = Color(0xFFFFFBFE),
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(8.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6750A4).copy(alpha = 0.3f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Row(
@@ -194,13 +194,13 @@ fun MenuHeader(titulo: String, promociones: String) {
                     Icon(
                         imageVector = Icons.Default.LocalOffer,
                         contentDescription = null,
-                        tint = Color(0xFF6750A4),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = promociones,
-                        color = Color(0xFF6750A4),
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )

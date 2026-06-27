@@ -95,7 +95,7 @@ val onBackgroundLightHighContrast = Color(0xFF181D18)
 val surfaceLightHighContrast = Color(0xFFF6FBF3)
 val onSurfaceLightHighContrast = Color(0xFF000000)
 val surfaceVariantLightHighContrast = Color(0xFFDDE5DB)
-val onSurfaceVariantLightHighContrast = Color(0xFF000000)
+val onSurfaceVariantHighContrast = Color(0xFF000000)
 val outlineLightHighContrast = Color(0xFF262E28)
 val outlineVariantLightHighContrast = Color(0xFF434B44)
 val scrimLightHighContrast = Color(0xFF000000)
@@ -217,10 +217,3 @@ val surfaceContainerLowDarkHighContrast = Color(0xFF1C211C)
 val surfaceContainerDarkHighContrast = Color(0xFF2C322D)
 val surfaceContainerHighDarkHighContrast = Color(0xFF373D38)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF434843)
-
-
-
-
-
-
-

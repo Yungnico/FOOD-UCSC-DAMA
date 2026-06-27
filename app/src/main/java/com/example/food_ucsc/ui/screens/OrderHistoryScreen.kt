@@ -45,10 +45,10 @@ fun OrderHistoryScreen(
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_desc))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFFBF8FF))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         when {
             uiState.isLoading -> {
@@ -58,7 +58,7 @@ fun OrderHistoryScreen(
                         .padding(innerPadding),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             }
             uiState.error != null -> {
@@ -70,7 +70,7 @@ fun OrderHistoryScreen(
                 ) {
                     Text(
                         text = uiState.error ?: stringResource(R.string.load_error_orders),
-                        color = Color(0xFFB3261E),
+                        color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(24.dp)
                     )
                 }
@@ -87,7 +87,7 @@ fun OrderHistoryScreen(
                         item {
                             Text(
                                 text = stringResource(R.string.no_orders),
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
@@ -112,7 +112,7 @@ fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -126,32 +126,45 @@ fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
                         modifier = Modifier
                             .size(40.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFEADDFF)),
+                            .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(imageVector = Icons.Default.Restaurant, contentDescription = null, tint = Color(0xFF21005D))
+                        Icon(
+                            imageVector = Icons.Default.Restaurant, 
+                            contentDescription = null, 
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text(text = order.restaurantName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Text(text = order.date, color = Color.Gray, fontSize = 12.sp)
+                        Text(
+                            text = order.restaurantName, 
+                            fontWeight = FontWeight.Bold, 
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = order.date, 
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                            fontSize = 12.sp
+                        )
                     }
                 }
                 Text(
                     text = "$${order.total}",
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF6750A4)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(modifier = Modifier.height(12.dp))
             
             Text(
                 text = order.items.joinToString(", "),
                 fontSize = 14.sp,
-                color = Color.DarkGray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +175,7 @@ fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = Color(0xFFE8F5E9),
+                    color = Color(0xFFE8F5E9), // Mantengo el verde de éxito para el estado
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
@@ -177,13 +190,16 @@ fun OrderItemCard(order: Order, onRateClick: () -> Unit) {
                 if (order.isRated) {
                     Text(
                         text = stringResource(R.string.rated),
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.outline,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 } else {
                     TextButton(onClick = onRateClick) {
-                        Text(stringResource(R.string.rate))
+                        Text(
+                            text = stringResource(R.string.rate),
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }

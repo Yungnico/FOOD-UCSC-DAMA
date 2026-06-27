@@ -36,13 +36,13 @@ fun AllCategoriesScreen(navController: NavController, categories: List<Category>
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF6750A4),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -67,7 +67,7 @@ fun CategoryListItem(category: Category, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp
     ) {
         Row(
@@ -79,14 +79,15 @@ fun CategoryListItem(category: Category, onClick: () -> Unit) {
             Icon(
                 imageVector = category.icon,
                 contentDescription = category.name,
-                tint = Color(0xFF6750A4),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = category.name,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

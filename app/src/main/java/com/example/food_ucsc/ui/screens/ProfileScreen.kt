@@ -53,11 +53,11 @@ fun ProfileScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFFBF8FF)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -71,14 +71,14 @@ fun ProfileScreen(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFFDE68A)),
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.RestaurantMenu,
                     contentDescription = null,
                     modifier = Modifier.size(60.dp),
-                    tint = Color(0xFF92400E)
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
             
@@ -87,12 +87,13 @@ fun ProfileScreen(
             Text(
                 text = displayName,
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = displayEmail,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -100,36 +101,37 @@ fun ProfileScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                color = Color(0xFFF3F0F8)
+                color = MaterialTheme.colorScheme.surfaceVariant
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.profile_points),
                         style = MaterialTheme.typography.labelLarge,
-                        color = Color(0xFF6750A4)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(R.string.reward_points, userPoints),
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
                         progress = { calorieProgress.coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth(),
-                        color = Color(0xFF6750A4),
-                        trackColor = Color.White
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.profile_health_goal, objectives),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.DarkGray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = stringResource(R.string.profile_daily_calorie_goal, calorieTarget),
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -169,10 +171,13 @@ fun ProfileScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB3261E)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(stringResource(R.string.profile_logout))
+                Text(
+                    text = stringResource(R.string.profile_logout),
+                    color = MaterialTheme.colorScheme.onError
+                )
             }
         }
     }
@@ -188,11 +193,11 @@ fun ProfileMenuItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        shadowElevation = 2.dp
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -202,23 +207,36 @@ fun ProfileMenuItem(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF3F0F8)),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = icon, contentDescription = null, tint = Color(0xFF6750A4))
+                Icon(
+                    imageVector = icon, 
+                    contentDescription = null, 
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
             
             Spacer(modifier = Modifier.width(16.dp))
             
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(text = subtitle, color = Color.Gray, fontSize = 12.sp)
+                Text(
+                    text = title, 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle, 
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, 
+                    fontSize = 12.sp
+                )
             }
             
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.outline
             )
         }
     }

@@ -45,14 +45,14 @@ fun ExploreScreen(
 
     Scaffold(
         bottomBar = { BottomNavBar(navController) },
-        containerColor = Color(0xFFFBF8FF)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Buscador (Estético)
+            // Buscador (Estético) con colores del tema
             OutlinedTextField(
                 value = uiState.searchQuery,
                 onValueChange = viewModel::onSearchQueryChange,
@@ -64,14 +64,14 @@ fun ExploreScreen(
                 trailingIcon = { Icon(Icons.Default.FilterList, contentDescription = null) },
                 shape = RoundedCornerShape(28.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF3F0F8),
-                    unfocusedContainerColor = Color(0xFFF3F0F8),
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent
                 )
             )
 
-            // Filtros
+            // Filtros con colores de la paleta verde
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,8 +84,9 @@ fun ExploreScreen(
                         onClick = { viewModel.onFilterChange(filter) },
                         label = { Text(filter) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFFEADDFF),
-                            selectedLabelColor = Color(0xFF21005D)
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -96,7 +97,7 @@ fun ExploreScreen(
             uiState.error?.let { error ->
                 Text(
                     text = error,
-                    color = Color(0xFFB3261E),
+                    color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -107,7 +108,8 @@ fun ExploreScreen(
                 text = stringResource(R.string.explore_available_locales),
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             LazyColumn(
