@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -64,7 +64,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(70.dp))
 
                 Icon(
-                    imageVector = Icons.Default.Whatshot,
+                    imageVector = Icons.Default.RestaurantMenu,
                     contentDescription = stringResource(R.string.logo_desc),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(80.dp)
