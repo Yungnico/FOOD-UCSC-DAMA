@@ -3,7 +3,9 @@ package com.example.food_ucsc.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.food_ucsc.data.repository.FoodRepository
+import com.example.food_ucsc.ui.state.ComparisonItem
 import com.example.food_ucsc.ui.state.ExploreUiState
+import com.example.food_ucsc.ui.state.PriceInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +24,6 @@ class ExploreViewModel(
     }
 
     private fun loadRestaurants() {
-        // EVITAR RECARGA: Si ya tenemos datos, no volvemos a llamar a la API
         if (_uiState.value.restaurants.isNotEmpty()) return
 
         viewModelScope.launch {
@@ -45,6 +46,60 @@ class ExploreViewModel(
                         filteredRestaurants = emptyList(),
                         isLoading = false,
                         error = ex.message ?: "No se pudieron cargar los locales"
+                    )
+                }
+            }
+        }
+    }
+
+    fun toggleComparison() {
+        val nextComparing = !_uiState.value.isComparing
+        _uiState.update { it.copy(isComparing = nextComparing) }
+        
+        if (nextComparing && _uiState.value.comparisonResults.isEmpty()) {
+            performComparison()
+        }
+    }
+
+    private fun performComparison() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                // Obtenemos todos los detalles de productos
+                val productsDto = foodRepository.getProductDetails()
+                val restaurants = _uiState.value.restaurants
+                
+                // Agrupamos por nombre de producto (normalizado)
+                val comparison = productsDto.groupBy { it.nombre.trim().lowercase() }
+                    .filter { it.value.size > 1 } // Solo los que están en más de un sitio
+                    .map { (name, dtos) ->
+                        val prices = dtos.flatMap { dto ->
+                            dto.menus.mapNotNull { menu ->
+                                val restName = restaurants.find { it.id == menu.localId }?.nombre
+                                if (restName != null) {
+                                    PriceInfo(restaurantName = restName, price = dto.precioBase)
+                                } else null
+                            }
+                        }.distinctBy { it.restaurantName }
+                        
+                        ComparisonItem(
+                            productName = dtos.first().nombre,
+                            prices = prices.sortedBy { it.price }
+                        )
+                    }
+                    .filter { it.prices.size > 1 }
+                
+                _uiState.update { 
+                    it.copy(
+                        comparisonResults = comparison,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = "Error al comparar precios: ${e.message}"
                     )
                 }
             }
