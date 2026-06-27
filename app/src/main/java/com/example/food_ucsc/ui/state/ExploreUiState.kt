@@ -5,7 +5,7 @@ import com.example.food_ucsc.ui.models.Restaurant
 data class PriceInfo(
     val restaurantName: String,
     val price: Double,
-    val productId: Int // Agregado para poder comprar desde la comparativa
+    val productId: Int
 )
 
 data class ComparisonItem(
@@ -22,5 +22,5 @@ data class ExploreUiState(
     val error: String? = null,
     val isComparing: Boolean = false,
     val comparisonResults: List<ComparisonItem> = emptyList(),
-    val purchaseMessage: String? = null // Mensaje de éxito de compra
+    val purchaseMessage: String? = null
 )
