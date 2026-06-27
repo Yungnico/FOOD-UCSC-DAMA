@@ -2,6 +2,7 @@
     <string name="app_name">Food UCSC</string>
     <string name="nav_home">Inicio</string>
     <string name="nav_explore">Explorar</string>
+    <string name="nav_map">Mapa</string>
     <string name="nav_profile">Perfil</string>
     <string name="start_here">Busca tu próxima comida</string>
     <string name="menu">Explorar menú</string>

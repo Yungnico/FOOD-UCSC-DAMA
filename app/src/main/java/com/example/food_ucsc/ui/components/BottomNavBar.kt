@@ -82,7 +82,7 @@ fun BottomNavBar(navController: NavController) {
                 }
             }
             NavItem(
-                label = "Map",
+                label = stringResource(R.string.nav_map),
                 icon = Icons.Default.LocationOn,
                 isActive = currentRoute == Screen.Map.route
             ) {
